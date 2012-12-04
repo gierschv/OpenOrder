@@ -5,10 +5,24 @@ api_version: 1
 threadsafe: yes
 
 handlers:
+
+# Static files
 - url: /favicon\.ico
   static_files: favicon.ico
   upload: favicon\.ico
 
+- url: /static
+  static_dir: static
+
+# Backend / Static
+- url: /backend
+  static_files: static/backend/views/index.html
+  upload: static/backend/views/index.html
+- url: /backend/(.*\.html)
+  static_files: static/backend/views/\1
+  upload: static/backend/views/(.*\.html)
+
+# App
 - url: .*
   script: main.app
 
