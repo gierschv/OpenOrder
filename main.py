@@ -15,10 +15,13 @@
 # limitations under the License.
 #
 import webapp2
+import entities
 
 class MainHandler(webapp2.RequestHandler):
     def get(self):
         self.response.write('Hello world!')
+        p = entities.Component(name="concombre", stock=12, Step=1)
+        p.put()
 
 app = webapp2.WSGIApplication([
     ('/', MainHandler)
