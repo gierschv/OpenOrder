@@ -18,9 +18,9 @@ handlers:
 - url: /backend
   static_files: static/backend/views/index.html
   upload: static/backend/views/index.html
-#- url: /backend/.*
-#  static_files: static/backend/views/\1
-#  upload: static/backend/views/.*\.html
+- url: /backend/(.*\.html)
+  static_files: static/backend/views/\1
+  upload: static/backend/views/(.*\.html)
 
 # App
 - url: .*
