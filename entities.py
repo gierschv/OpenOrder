@@ -8,15 +8,19 @@ class User(db.Model):
 	last_name = db.StringProperty()
 	inscription = db.DateProperty()
 	active = db.BooleanProperty()
-	facebookToken = db.StringProperty()
-	Uid = db.IntegerProperty();
+	facebookToken = db.StringProperty(required=True)
+	uid = db.IntegerProperty(required=True)
 	email = db.EmailProperty()
 
 class Component(db.Model):
-	name = db.StringProperty()
-	stock = db.IntegerProperty()
-	Step = db.IntegerProperty()
+	name = db.StringProperty(required=True)
+	stock = db.IntegerProperty(required=True)
+	Step = db.IntegerProperty(required=True)
 
-
-class Order(db.Model):
+class favoritOrder(db.Model):
+	name = db.StringProperty(required=True)
+	ingredient = db.ListProperty(db.Key)
 	nbVote = db.IntegerProperty()
+
+class CurrentOrder(db.Model)
+
