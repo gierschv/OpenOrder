@@ -2,7 +2,7 @@
     /**
      * The application's namespace, used by Sencha Command to generate classes
      */
-    "name": "GS",
+    "name": "OpenOrder",
 
     /**
      * The file path to this application's front HTML document, relative to this app.json file
@@ -136,5 +136,5 @@
      * Uniquely generated id for this application, used as prefix for localStorage keys.
      * Normally you should never change this value.
      */
-    "id": "9b33181f-d25c-45bf-b10f-879106430cbd"
+    "id": "3aa5cf94-65f9-4558-ba13-a201a53efc3a"
 }

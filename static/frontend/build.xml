@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<project name="GS" default=".help">
+<project name="OpenOrder" default=".help">
     <import file="${basedir}/.sencha/app/build-impl.xml"/>
 
     <!--

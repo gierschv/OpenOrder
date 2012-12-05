@@ -1,4 +1,4 @@
-Ext.define('GS.view.Main', {
+Ext.define('OpenOrder.view.Main', {
     extend: 'Ext.tab.Panel',
     xtype: 'main',
     requires: [

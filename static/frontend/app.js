@@ -1,12 +1,12 @@
 //<debug>
 Ext.Loader.setPath({
     'Ext': 'touch/src',
-    'GS': 'app'
+    'OpenOrder': 'app'
 });
 //</debug>
 
 Ext.application({
-    name: 'GS',
+    name: 'OpenOrder',
 
     requires: [
         'Ext.MessageBox'
@@ -37,7 +37,7 @@ Ext.application({
         Ext.fly('appLoadingIndicator').destroy();
 
         // Initialize the main view
-        Ext.Viewport.add(Ext.create('GS.view.Main'));
+        Ext.Viewport.add(Ext.create('OpenOrder.view.Main'));
     },
 
     onUpdated: function() {
