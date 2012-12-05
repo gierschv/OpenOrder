@@ -1,6 +1,6 @@
 'use strict';
 
-function AuthCtrl($scope, $http) {
+function AuthCtrl($scope, $http, $location, $rootScope) {
   FB.init({
     appId      : '530821850262515', // App ID
     channelUrl : '//open-order.appspot.com/static/common/views/channel.html', // Channel File
@@ -9,18 +9,23 @@ function AuthCtrl($scope, $http) {
     xfbml      : true  // parse XFBML
   });
 
-  FB.getLoginStatus(function(response) {
+  FB.Event.subscribe('auth.login', function(response) {
     // Non-connected or unauthorized user
-    console.log(response.status !== 'connected');
     if (response.status !== 'connected') {
       //document.location.href = '/';
     }
     else {
-      console.log(response);
       // Fetch api_key
-      $http.get('/api/auth', {'params': response.authResponse }).success(function(data) {
-        console.log(data);
+      $http.get('/api/auth', {'params': response.authResponse }).success(function(profile) {
+        $rootScope['profile'] = profile;
+        $location.path('/home');
       });
     }
   });
+}
+
+
+function HomeCtrl() {
+
+
 }
