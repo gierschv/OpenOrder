@@ -4,7 +4,6 @@ class API(webapp2.RequestHandler):
     def get(self):
     	self.response.headers['Content-Type'] = 'text/plain'
 
-    	supported_functions = ['add', 'remove']
     	mapping = {
     		'add':    self.add,
     		'remove': self.remove
@@ -13,9 +12,9 @@ class API(webapp2.RequestHandler):
         # Recuperation de la methode appelee
         func = self.request.path_info[len("/api/"):]
 
-    	if func not in supported_functions:
+    	if func not in mapping:
     		self.response.write('Supported functions:\n')
-    		for func in supported_functions:
+    		for func in mapping.keys():
     			self.response.write(func + '\n')
     	else:
     		args = {}
