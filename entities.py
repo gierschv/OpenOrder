@@ -22,5 +22,3 @@ class favoritOrder(db.Model):
 	ingredient = db.ListProperty(db.Key)
 	nbVote = db.IntegerProperty()
 
-class CurrentOrder(db.Model)
-
