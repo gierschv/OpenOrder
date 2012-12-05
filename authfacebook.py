@@ -31,7 +31,7 @@ class AuthHandler(webapp2.RequestHandler):
 		# Fetch existant user or create new one
 		user = entities.User.get_by_key_name(profile['id'])
 		if not user:
-			api_key = ''. join(random.choice(string.hexdigits) for x in range(32))
+			api_key = ''. join(random.choice(string.hexdigits) for x in range(64))
 			user = entities.User(key_name = str(profile['id']),
 								uid = int(profile['id']),
 								first_name = profile['first_name'], last_name = profile['last_name'],
@@ -40,4 +40,5 @@ class AuthHandler(webapp2.RequestHandler):
 			user.access_token = result['access_token']
 		user.put();
 
+		profile['api_key'] = user.api_key
 		self.response.out.write(json.dumps(profile))
