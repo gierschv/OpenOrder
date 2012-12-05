@@ -17,10 +17,13 @@
 import webapp2
 from google.appengine.ext import db
 
+import api
+
 class MainHandler(webapp2.RequestHandler):
     def get(self):
         self.response.write('Hello world!')
 
 app = webapp2.WSGIApplication([
-    ('/', MainHandler)
+    ('/', MainHandler),
+    ('/api/.*', api.API)
 ], debug=True)
