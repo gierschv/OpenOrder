@@ -8797,6 +8797,9 @@ a.badge:hover {
 .navbar {
   display: none;
 }
+.container.wrapper {
+  margin-top: 50px;
+}
 .ng-auth {
   text-align: center;
   font-weight: 300;
@@ -8806,4 +8809,12 @@ a.badge:hover {
 .ng-auth img {
   margin: 40px auto;
   display: block;
+}
+.ng-home {
+  text-align: center;
+  margin: 200px 0 0 0;
+}
+.ng-home p {
+  font-size: 20px;
+  font-weight: 300px;
 }
