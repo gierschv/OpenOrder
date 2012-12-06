@@ -1,12 +1,11 @@
 import webapp2
 import json
 import entities
-import urllib
 
 class API(webapp2.RequestHandler):
 
     #
-    # Request handling, GET or POST
+    # Request handling, GET/POST/DELETE
     #
 
     def get(self):
@@ -53,6 +52,24 @@ class API(webapp2.RequestHandler):
                 self.response.write(func + '\n')
         else:
             mapping[func](self.request.POST['data'])
+
+    def delete(self):
+        self.response.headers['Content-Type'] = 'test/plain'
+
+        mapping = {
+            'remove_step':      self.remove_step,
+            'remove_component': self.remove_component
+        }
+
+        # Recuperation de la methode appelee
+        func = self.request.path_info[len("/api/"):]
+
+        if func not in mapping:
+            self.response.write('Supported functions:\n')
+            for func in mapping.keys():
+                self.response.write(func + '\n')
+        else:
+            mapping[func](self.request.body)
 
     #
     # Utils
@@ -148,22 +165,91 @@ class API(webapp2.RequestHandler):
         for extraKey in componentDescription:
             self.response.write('Ignoring extra key "' + extraKey + '"\n')
 
-        self.response.write('Looking for step with name "' + compStep + '"...')
-
-        matchingSteps = entities.apiStep().search(compStep)
+        # Recuperation de la step
+        matchingStep = entities.apiStep().search(compStep)
         stepKey = None
 
-        if matchingSteps == None:
+        if matchingStep == None:
             self.response.write('Step not found\n')
             return
         else:
-            self.response.write('Found step:\n')
-            self.response.write('Step name: ' + matchingSteps.name + '\n')
-            self.response.write('Step key: ')
-            self.response.write(matchingSteps.key())
-            self.response.write('\n')
-            stepKey = matchingSteps.key()
+            # Recuperation de la key de la step
+            stepKey = matchingStep.key()
 
-        entities.apiComponent().add(compName, compStock, stepKey, compPrice)
+        # Ajout du component a la step
+        entities.apiComponent().add(compName, compStock, stepKey, float(compPrice))
 
         self.response.write('Component "' + compName + '" successfully added to step "' + compStep + '"\n')
+
+    #
+    # DELETE methods
+    #
+
+    def remove_step(self, requestBody):
+
+        requestData = json.loads(requestBody)
+
+        # Check si le nom de la step est present
+        requiredKeys = ['step']
+        if not self.checkRequiredKeys(requestBody, requiredKeys):
+            self.response.write('Error, missing required key in request. Required keys are:\n')
+            for key in requiredKeys:
+                self.response.write(key + '\n')
+            return
+
+        # Recuperation du nom de la step
+        stepName = requestData.pop('step')
+
+        # On previent qu'on ignore les donnees inutiles
+        for extraKey in componentDescription:
+            self.response.write('Ignoring extra key "' + extraKey + '"\n')
+
+        # Recuperation de l'objet step
+        matchingStep = entities.apiStep().search(stepName)
+        stepKey = None
+
+        if matchingStep == None:
+            self.response.write('Step not found\n')
+            return
+        else:
+            # Recuperation de la key de la step
+            stepKey = matchingStep.key()
+
+        entities.apiStep().delete(stepKey)
+
+        self.response.write('Step "' + stepName + '" removed successfully.')
+
+    def remove_component(self, requestBody):
+
+        self.response.write('Request body: "' + requestBody + '"\n')
+        componentDescription = json.loads(requestBody)
+
+        # Check si le nom du component est present
+        requiredKeys = ['component']
+        if not self.checkRequiredKeys(componentDescription, requiredKeys):
+            self.response.write('Error, missing required key in request. Required keys are:\n')
+            for key in requiredKeys:
+                self.response.write(key + '\n')
+            return
+
+        # Recuperation du nom du component
+        compName = componentDescription.pop('component')
+
+        # On previent qu'on ignore les donnees inutiles
+        for extraKey in componentDescription:
+            self.response.write('Ignoring extra key "' + extraKey + '"\n')
+
+        # Recuperation de l'objet component
+        matchingComp = entities.apiComponent().search(compName)
+        compKey = None
+
+        if matchingComp == None:
+            self.response.write('Component not found\n')
+            return
+        else:
+            # Recuperation de la key du component
+            compKey = matchingComp.key()
+
+        entities.apiComponent().delete(compKey)
+
+        self.response.write('comp "' + compName + '" removed successfully.')

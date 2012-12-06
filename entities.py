@@ -124,7 +124,8 @@ class apiComponent():
 		Component(name = Name, stock = Stock, prix = pPrix, Step = keyStep).put()
 
 	def delete(self, comKey):
-		Component.all().ancestor(comKey).delete()
+		q = db.get(comKey)
+		q.delete()
 
 	def update(self, comKey, Name, Stock, stepKey, pPrix):
 		com = db.get(comKey)
