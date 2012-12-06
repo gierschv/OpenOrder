@@ -25,12 +25,52 @@ class favoritOrder(db.Model):
 	name = db.StringProperty(required = True)
 	ingredient = db.ListProperty(db.Key)
 	nbVote = db.IntegerProperty()
+	User = db.ReferenceProperty(User)
 
 class Order(db.Model):
 	ingredient = db.ListProperty(db.Key)
 	dateCommand = db.DateProperty()
 	Sold = db.DateProperty()
 	User = db.ReferenceProperty(User)
+
+class apiOrder():
+	def add(self, listCom, dateBuy, keyUser):
+		O = Order(ingredient=listCom, dateCommand=dateBuy, User=keyUser)
+		O.put()
+
+	def search():
+		pass
+
+	def delete(self, key):
+		O = db.get(key)
+		O.delete()
+	
+	def update(self, ingredient, keyOrder, dateSoldOut, keyUser):
+		O = db.get(keyOrder)
+		O.ingredient = ingredient
+		O.Sold = dateSoldOut
+		O.User = keyUser
+		O.put()
+
+class apifavoriteOrder():
+	def add(self, listCom, nbVote, keyUser, pname):
+		O = FavOrder(ingredient=listCom, nbVote=nbVote, User=keyUser, name=pname)
+		O.put()
+
+	def search():
+		pass
+
+	def delete(self, key):
+		O = db.get(key)
+		O.delete()
+	
+	def update(self, ingredient, keyFav, pName, pNbVote, keyUser):
+		O = db.get(keyfav)
+		O.ingredient = ingredient
+		O.name = pName
+		O.User = keyUser
+		O.nbVote = O.pNbVote
+		O.put()
 
 class apiStep():
 	def add(self, Name, number, pType):
@@ -75,4 +115,3 @@ class apiComponent():
 		else:
 			q = Component.all()
 			return q.filter('name =', pName).get()
-		
