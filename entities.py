@@ -33,6 +33,10 @@ class Order(db.Model):
 	Sold = db.DateProperty()
 	User = db.ReferenceProperty(User)
 
+class apiMain():
+	def get(self, key):
+		return db.get(key)
+
 class apiOrder():
 	def add(self, listCom, dateBuy, keyUser):
 		O = Order(ingredient=listCom, dateCommand=dateBuy, User=keyUser)
@@ -40,6 +44,10 @@ class apiOrder():
 
 	def search():
 		pass
+
+	def getCurrentOrder(self, pLimit):
+		q = Order.all()
+		return q.filter('Sold =', None).order('-dateCommand').fetch(limit=pLimit)
 
 	def delete(self, key):
 		O = db.get(key)
