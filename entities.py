@@ -115,6 +115,10 @@ class apiStep():
 	def getChoice(self):
 		return ["one", "multi", "warning"];
 
+	def ifexist(self, index):
+		q = Step.all()
+		return q.filter('index =', index).get()
+
 class apiComponent():
 	def add(self, Name, Stock, keyStep, pPrix):
 		Component(name = Name, stock = Stock, prix = pPrix, Step = keyStep).put()
