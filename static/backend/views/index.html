@@ -10,6 +10,7 @@
   <script src="/static/backend/js/app.js"></script>
   <script src="/static/backend/js/controllers.js"></script>
 
+  <link href="//fonts.googleapis.com/css?family=Open+Sans:400,300,700" rel="stylesheet">
   <link href="/static/backend/css/bootstrap.css" rel="stylesheet">
 </head>
 <body>
@@ -29,14 +30,14 @@
               <li><a href="#/orders">Orders</a></li>
             </ul>
           </div>
+
+          <div class="pull-right"><ul class="nav"><li><a href="#/logout" ng-click="FBlogout()"><i class="icon icon-off"></i> Logout</a></li></ul></div>
         </div>
       </div>
     </div>
 
-
     <div ng-view></div>
-    <div id="fb-root"></div>
 
-    <div class="fb-login-button" data-show-faces="false" data-width="100" data-max-rows="1"></div>
+    <!-- <div class="fb-login-button" data-show-faces="false" data-width="100" data-max-rows="1"></div> -->
 </body>
 </html>

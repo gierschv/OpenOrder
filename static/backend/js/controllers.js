@@ -1,18 +1,10 @@
 'use strict';
 
 function AuthCtrl($scope, $http, $location, $rootScope) {
-  FB.init({
-    appId      : '530821850262515', // App ID
-    channelUrl : '//open-order.appspot.com/static/common/views/channel.html', // Channel File
-    status     : true, // check login status
-    cookie     : true, // enable cookies to allow the server to access the session
-    xfbml      : true  // parse XFBML
-  });
-
-  FB.Event.subscribe('auth.login', function(response) {
+  var eventLogin = function(response) {
     // Non-connected or unauthorized user
     if (response.status !== 'connected') {
-      //document.location.href = '/';
+      document.location.href = '/';
     }
     else {
       // Fetch api_key
@@ -21,11 +13,19 @@ function AuthCtrl($scope, $http, $location, $rootScope) {
         $location.path('/home');
       });
     }
-  });
+  };
+
+  FB.Event.subscribe('auth.authResponseChange', eventLogin);
+  FB.getLoginStatus(eventLogin);
 }
 
+function HomeCtrl($location, $rootScope) {
+  if ($rootScope['profile'] === undefined) {
+    return $location.path('/auth');
+  }
+  $('.navbar').show();
+}
 
-function HomeCtrl() {
-
-
+function LogoutCtrl() {
+  $('.navbar').hide();
 }
