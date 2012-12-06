@@ -2,6 +2,10 @@
 
 from google.appengine.ext import db
 
+#
+#	Class User
+#
+
 class User(db.Model):
 	uid = db.IntegerProperty(required = True)
 	api_key = db.StringProperty(required = True)
@@ -34,9 +38,16 @@ class Order(db.Model):
 	Sold = db.DateProperty()
 	User = db.ReferenceProperty(User)
 
+#
+#	Class to get back any kind of entities. request is based on the key, useful with foreign key
+#
+
 class apiMain():
 	def get(self, key):
 		return db.get(key)
+#
+#	Class apiOrder, use to do operations on the Order entities
+#
 
 class apiOrder():
 	def add(self, listCom, dateBuy, keyUser):
@@ -69,6 +80,11 @@ class apiOrder():
 		O.User = keyUser
 		O.put()
 
+#
+#	Class apiFavoriteOder, manage operation on users favortie Order
+#	Link are made on User and Component
+#
+
 class apifavoriteOrder():
 	def add(self, listCom, nbVote, keyUser, pname):
 		O = FavOrder(ingredient=listCom, nbVote=nbVote, User=keyUser, name=pname)
@@ -88,6 +104,11 @@ class apifavoriteOrder():
 		O.User = keyUser
 		O.nbVote = pNbVote
 		O.put()
+
+#
+#	Class Api Step, Step are managed by this class, BEWARE with delete when the function 
+#	is called all the component linked with are dropped.
+#
 
 class apiStep():
 	def add(self, Name, number, pType):
