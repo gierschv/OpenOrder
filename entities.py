@@ -50,8 +50,8 @@ class apiMain():
 #
 
 class apiOrder():
-	def add(self, listCom, dateBuy, keyUser):
-		O = Order(ingredient=listCom, dateCommand=dateBuy, User=keyUser)
+	def add(self, listCom, dateBuy, id):
+		O = Order(ingredient=listCom, dateCommand=dateBuy, User=User.get_by_id(id).key())
 		O.put()
 
 	def search():
@@ -61,23 +61,23 @@ class apiOrder():
 		q = Order.all()
 		return q.filter('Sold =', None).order('-dateCommand').fetch(limit=pLimit)
 
-	def getUserOrder(self, userKey, pLimit):
+	def getUserOrder(self, id, pLimit):
 		q = Order.all()
-		return q.filter('User =', userKey).order('-dateCommand').fetch(limit = pLimit)
+		return q.filter('User =', User.get_by_id(id).key()).order('-dateCommand').fetch(limit = pLimit)
 
-	def getUserfavOrder(self, userKey, pLimit):
+	def getUserfavOrder(self, id, pLimit):
 		q = favoritOrder.all()
-		return q.filter('User =', userKey).order('-nbVote').fetch(limit = pLimit)
+		return q.filter('User =', User.get_by_id(id).key()).order('-nbVote').fetch(limit = pLimit)
 
-	def delete(self, key):
+	def delete(self, ):
 		O = db.get(key)
 		O.delete()
 	
-	def update(self, ingredient, keyOrder, dateSoldOut, keyUser):
-		O = db.get(keyOrder)
+	def update(self, ingredient, idOrder, dateSoldOut, idUser):
+		O = Order.get_by_id(idOrder)
 		O.ingredient = ingredient
 		O.Sold = dateSoldOut
-		O.User = keyUser
+		O.User = User().get_by_id(idUser).key()
 		O.put()
 
 #
@@ -86,22 +86,22 @@ class apiOrder():
 #
 
 class apifavoriteOrder():
-	def add(self, listCom, nbVote, keyUser, pname):
-		O = FavOrder(ingredient=listCom, nbVote=nbVote, User=keyUser, name=pname)
+	def add(self, listCom, nbVote, idUser, pname):
+		O = FavOrder(ingredient=listCom, nbVote=nbVote, User=User.get_by_id(idUser).key(), name=pname)
 		O.put()
 
 	def search():
 		pass
 
-	def delete(self, key):
-		O = db.get(key)
+	def delete(self, id):
+		O = FavOrder.get_by_id(id)
 		O.delete()
 	
-	def update(self, ingredient, keyFav, pName, pNbVote, keyUser):
-		O = db.get(keyfav)
+	def update(self, ingredient, idFav, pName, pNbVote, idUser):
+		O = FavOrder.get_by_id(idFav)
 		O.ingredient = ingredient
 		O.name = pName
-		O.User = keyUser
+		O.User = User.get_by_id(idUser).key()
 		O.nbVote = pNbVote
 		O.put()
 
@@ -115,9 +115,11 @@ class apiStep():
 		s = Step(name=Name, number=number, type=pType)
 		s.put()
 
-	def delete(self, stepKey):
-		Component.all().ancestor(stepKey).delete()
-		db.delete(stepKey)
+	def delete(self, idStep):
+		c = Component.all()
+		c.filter('Step =', Step.get_by_id(idStep).key()).delete()
+		q = Step.get_by_id(idStep)
+		q.delete()
 
 	def search(self, pName):
 		if pName is None:
@@ -126,8 +128,8 @@ class apiStep():
 			q = Step.all()
 			return q.filter('name =', pName).get()
 
-	def update(self, name, number, pType, key):
-		oStep = db.get(key)
+	def update(self, name, number, pType, idStep):
+		oStep = Step.get_by_id(idStep)
 		oStep.name = name
 		oStep.number = number
 		oStep.step = pType
@@ -141,18 +143,19 @@ class apiStep():
 		return q.filter('index =', index).get()
 
 class apiComponent():
-	def add(self, Name, Stock, keyStep, pPrix):
-		Component(name = Name, stock = Stock, prix = pPrix, Step = keyStep).put()
+	def add(self, Name, Stock, idStep, pPrix):
+		C = Component(name = Name, stock = Stock, prix = pPrix, Step = Step.get_by_id(idStep).key())
+		C.put()
 
-	def delete(self, comKey):
-		q = db.get(comKey)
+	def delete(self, idCom):
+		q = Component.get_by_id(idCom)
 		q.delete()
 
-	def update(self, comKey, Name, Stock, stepKey, pPrix):
-		com = db.get(comKey)
+	def update(self, idCom, Name, Stock, idStep, pPrix):
+		com = Component.get_by_id(idCom)
 		com.name = Name
 		com.stock = Stock
-		com.Step = stepKey
+		com.Step = Step.get_by_id(idStep).key()
 		com.prix = pPrix
 		com.put()
 

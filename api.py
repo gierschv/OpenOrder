@@ -90,7 +90,7 @@ class API(webapp2.RequestHandler):
     def add(self, argumentMap, requestBody):
     	self.response.write('Called function add, arguments:\n')
         entities.apiStep().add("starters", 1, "multi")
-        entities.apiComponent().add("chips", 152, entities.apiStep().search('starters').key(), 5.25)
+        entities.apiComponent().add("chips", 152, entities.apiStep().search('starters').key().id(), 5.25)
     	self.response.write(argumentMap)
 
     def remove(self, argumentMap, requestBody):
@@ -100,7 +100,7 @@ class API(webapp2.RequestHandler):
     def update(self, argumentMap, requestBody):
         self.response.write('Called functions update, arguments:\n')
         obj = entities.apiComponent().search("chips")
-        entities.apiComponent().update(obj.key(), obj.name, obj.stock - 1, obj.Step, 12.0)
+        entities.apiComponent().update(obj.key().id(), obj.name, obj.stock - 1, obj.Step.key().id(), 12.0)
 
     #
     # POST methods
