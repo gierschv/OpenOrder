@@ -1,4 +1,5 @@
 import webapp2
+import entities
 
 class API(webapp2.RequestHandler):
     def get(self):
@@ -6,7 +7,8 @@ class API(webapp2.RequestHandler):
 
     	mapping = {
     		'add':    self.add,
-    		'remove': self.remove
+    		'remove': self.remove,
+            'update': self.update
     	}
 
         # Recuperation de la methode appelee
@@ -26,8 +28,17 @@ class API(webapp2.RequestHandler):
 
     def add(self, argumentMap):
     	self.response.write('Called function add, arguments:\n')
+        #entities.apiStep().add("starters", 1, "multi")
+        #entities.apiComponent().add("chips", 152, entities.apiStep().search('starters').key())
     	self.response.write(argumentMap)
 
     def remove(self, argumentMap):
     	self.response.write('Called function remove, arguments:\n')
     	self.response.write(argumentMap)
+
+    def update(self, argumentMap):
+        self.response.write('Called functions update, arguments:\n')
+        obj = entities.apiComponent().search("chips")
+        entities.apiComponent().update(obj.key(), obj.name, obj.stock - 1, obj.Step)
+
+    
