@@ -19,13 +19,34 @@ function AuthCtrl($scope, $http, $location, $rootScope) {
   FB.getLoginStatus(eventLogin);
 }
 
+function LogoutCtrl() {
+  $('.navbar').hide();
+}
+
 function HomeCtrl($location, $rootScope) {
   if ($rootScope['profile'] === undefined) {
     return $location.path('/auth');
   }
+
   $('.navbar').show();
+  $('.navbar li.active').removeClass('active');
+  $('.navbar li.nav-home').addClass('active');
 }
 
-function LogoutCtrl() {
-  $('.navbar').hide();
+function ComponentsCtrl($location, $rootScope) {
+  if ($rootScope['profile'] === undefined) {
+    return $location.path('/auth');
+  }
+
+  $('.navbar li.active').removeClass('active');
+  $('.navbar li.nav-components').addClass('active');
+}
+
+function OrdersCtrl($location, $rootScope) {
+  if ($rootScope['profile'] === undefined) {
+    return $location.path('/auth');
+  }
+
+  $('.navbar li.active').removeClass('active');
+  $('.navbar li.nav-orders').addClass('active');
 }

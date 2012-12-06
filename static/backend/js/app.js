@@ -6,6 +6,8 @@ var app = angular.module('openorder', []).
       when('/auth', { templateUrl: '/backend/_auth.html', controller: AuthCtrl }).
       when('/logout', { templateUrl: '/backend/_logout.html', controller: LogoutCtrl }).
       when('/home', { templateUrl: '/backend/_home.html', controller: HomeCtrl }).
+      when('/components', { templateUrl: '/backend/_components.html', controller: ComponentsCtrl }).
+      when('/orders', { templateUrl: '/backend/_orders.html', controller: OrdersCtrl }).
       otherwise({redirectTo: '/auth'});
 }]);
 
