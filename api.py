@@ -40,5 +40,4 @@ class API(webapp2.RequestHandler):
         self.response.write('Called functions update, arguments:\n')
         obj = entities.apiComponent().search("chips")
         entities.apiComponent().update(obj.key(), obj.name, obj.stock - 1, obj.Step)
-
     

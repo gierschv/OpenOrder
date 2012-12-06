@@ -103,6 +103,9 @@ class apiStep():
 		oStep.step = pType
 		oStep.put()
 
+	def getChoice(self):
+		return ["one", "multi", "warning"];
+
 class apiComponent():
 	def add(self, Name, Stock, keyStep):
 		Component(name = Name, stock = Stock, Step = keyStep).put()
