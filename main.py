@@ -15,9 +15,8 @@
 # limitations under the License.
 #
 import webapp2
-from google.appengine.ext import db
-
 import api
+import authfacebook
 
 class MainHandler(webapp2.RequestHandler):
     def get(self):
@@ -25,6 +24,6 @@ class MainHandler(webapp2.RequestHandler):
 
 app = webapp2.WSGIApplication([
     ('/', MainHandler),
-    ('/api/.*', api.API)
+    ('/api/.*', api.API),
     ('/api/auth', authfacebook.AuthHandler)
 ], debug=True)

@@ -69,7 +69,7 @@ class apifavoriteOrder():
 		O.ingredient = ingredient
 		O.name = pName
 		O.User = keyUser
-		O.nbVote = O.pNbVote
+		O.nbVote = pNbVote
 		O.put()
 
 class apiStep():
