@@ -3,26 +3,26 @@
 from google.appengine.ext import db
 
 class User(db.Model):
+	uid = db.IntegerProperty(required = True)
+	api_key = db.StringProperty(required = True)
+	access_token = db.StringProperty()
 	first_name = db.StringProperty()
 	last_name = db.StringProperty()
-	inscription = db.DateProperty()
 	active = db.BooleanProperty()
-	facebookToken = db.StringProperty(required=True)
-	uid = db.IntegerProperty(required=True)
-	email = db.EmailProperty()
 
 class Component(db.Model):
-	name = db.StringProperty(required=True)
-	stock = db.IntegerProperty(required=True)
-	Step = db.ReferenceProperty(required=True)
+	name = db.StringProperty(required = True)
+	stock = db.IntegerProperty(required = True)
+	Step = db.IntegerProperty(required = True)
 
 class Step(db.Model):
 	name = db.StringProperty()
 	number = db.IntegerProperty()
 	type = db.StringProperty(required = True, choices=set(["one", "multi", "warning"]))
 
+
 class favoritOrder(db.Model):
-	name = db.StringProperty(required=True)
+	name = db.StringProperty(required = True)
 	ingredient = db.ListProperty(db.Key)
 	nbVote = db.IntegerProperty()
 

@@ -2,7 +2,7 @@ application: open-order
 version: 1
 runtime: python27
 api_version: 1
-threadsafe: yes
+threadsafe: true
 
 handlers:
 
@@ -22,6 +22,10 @@ handlers:
   static_files: static/backend/views/\1
   upload: static/backend/views/(.*\.html)
 
+# Frontend / Static
+- url: /frontend
+  static_dir: static/frontend
+  
 # App
 - url: .*
   script: main.app

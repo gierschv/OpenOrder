@@ -26,4 +26,5 @@ class MainHandler(webapp2.RequestHandler):
 app = webapp2.WSGIApplication([
     ('/', MainHandler),
     ('/api/.*', api.API)
+    ('/api/auth', authfacebook.AuthHandler)
 ], debug=True)
