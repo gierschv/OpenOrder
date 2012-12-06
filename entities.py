@@ -10,16 +10,17 @@ class User(db.Model):
 	last_name = db.StringProperty()
 	active = db.BooleanProperty()
 
-class Component(db.Model):
-	name = db.StringProperty(required = True)
-	stock = db.IntegerProperty(required = True)
-	Step = db.IntegerProperty(required = True)
-
 class Step(db.Model):
 	name = db.StringProperty()
 	number = db.IntegerProperty()
 	type = db.StringProperty(required = True, choices=set(["one", "multi", "warning"]))
 
+
+class Component(db.Model):
+	name = db.StringProperty(required = True)
+	stock = db.IntegerProperty(required = True)
+	prix = db.FloatProperty(required = True)
+	Step = db.ReferenceProperty(Step)
 
 class favoritOrder(db.Model):
 	name = db.StringProperty(required = True)
@@ -48,6 +49,14 @@ class apiOrder():
 	def getCurrentOrder(self, pLimit):
 		q = Order.all()
 		return q.filter('Sold =', None).order('-dateCommand').fetch(limit=pLimit)
+
+	def getUserOrder(self, userKey, pLimit):
+		q = Order.all()
+		return q.filter('User =', userKey).order('-dateCommand').fetch(limit = pLimit)
+
+	def getUserfavOrder(self, userKey, pLimit):
+		q = favoritOrder.all()
+		return q.filter('User =', userKey).order('-nbVote').fetch(limit = pLimit)
 
 	def delete(self, key):
 		O = db.get(key)
@@ -107,17 +116,18 @@ class apiStep():
 		return ["one", "multi", "warning"];
 
 class apiComponent():
-	def add(self, Name, Stock, keyStep):
-		Component(name = Name, stock = Stock, Step = keyStep).put()
+	def add(self, Name, Stock, keyStep, pPrix):
+		Component(name = Name, stock = Stock, prix = pPrix, Step = keyStep).put()
 
 	def delete(self, comKey):
 		Component.all().ancestor(comKey).delete()
 
-	def update(self, comKey, Name, Stock, stepKey):
+	def update(self, comKey, Name, Stock, stepKey, pPrix):
 		com = db.get(comKey)
 		com.name = Name
 		com.stock = Stock
 		com.Step = stepKey
+		com.prix = pPrix
 		com.put()
 
 	def search(self, pName):

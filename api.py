@@ -28,8 +28,8 @@ class API(webapp2.RequestHandler):
 
     def add(self, argumentMap):
     	self.response.write('Called function add, arguments:\n')
-        #entities.apiStep().add("starters", 1, "multi")
-        #entities.apiComponent().add("chips", 152, entities.apiStep().search('starters').key())
+        entities.apiStep().add("starters", 1, "multi")
+        entities.apiComponent().add("chips", 152, entities.apiStep().search('starters').key(), 5.25)
     	self.response.write(argumentMap)
 
     def remove(self, argumentMap):
@@ -39,5 +39,5 @@ class API(webapp2.RequestHandler):
     def update(self, argumentMap):
         self.response.write('Called functions update, arguments:\n')
         obj = entities.apiComponent().search("chips")
-        entities.apiComponent().update(obj.key(), obj.name, obj.stock - 1, obj.Step)
+        entities.apiComponent().update(obj.key(), obj.name, obj.stock - 1, obj.Step, 12.0)
     
