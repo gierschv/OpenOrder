@@ -9,12 +9,14 @@ class API(webapp2.RequestHandler):
     #
 
     def get(self):
-    	self.response.headers['Content-Type'] = 'text/plain'
+    	self.response.headers['Content-Type'] = 'application/json'
 
     	mapping = {
-    		'add':      self.add,
-    		'remove':   self.remove,
-            'update':   self.update
+            'steps' : self.get_steps,
+            'steps.json' : self.get_steps,
+            'components' : self.get_components,
+            'components.json' : self.get_components
+#            'get_components_from_step_index' : get_components_from_step_index
     	}
 
         # Recuperation de la methode appelee
@@ -29,7 +31,7 @@ class API(webapp2.RequestHandler):
     		for argumentName in self.request.arguments():
     			args[argumentName] = self.request.get(argumentName)
 
-    		mapping[func](args, self.request.body)
+    		mapping[func](args)
 
     def post(self):
         self.response.headers['Content-Type'] = 'text/plain'
@@ -83,24 +85,73 @@ class API(webapp2.RequestHandler):
 
         return False if missingRequiredKey else True
 
+    def serializableDataFromComponent(self, component):
+        componentData = {
+            'name'  : component.name,
+            'stock' : component.stock,
+            'price' : component.prix,
+            'id'    : component.key().id()
+        }
+        return componentData
+
+    def serializableDataFromStep(self, step):
+        stepData = {
+            'name'  : step.name,
+            'index' : step.number,
+            'type'  : step.type,
+            'id'    : step.key().id()
+        }
+        return stepData
+
     #
     # GET methods
     #
 
-    def add(self, argumentMap, requestBody):
-    	self.response.write('Called function add, arguments:\n')
-        entities.apiStep().add("starters", 1, "multi")
-        entities.apiComponent().add("chips", 152, entities.apiStep().search('starters').key().id(), 5.25)
-    	self.response.write(argumentMap)
+    # def add(self, argumentMap, requestBody):
+    # 	self.response.write('Called function add, arguments:\n')
+    #     entities.apiStep().add("starters", 1, "multi")
+    #     entities.apiComponent().add("chips", 152, entities.apiStep().search('starters').key().id(), 5.25)
+    # 	self.response.write(argumentMap)
 
-    def remove(self, argumentMap, requestBody):
-    	self.response.write('Called function remove, arguments:\n')
-    	self.response.write(argumentMap)
+    def get_steps(self, argumentMap):
+        steps = entities.apiStep().search(None)
+        stepsData = []
+        for step in steps:
+            stepData = self.serializableDataFromStep(step)
 
-    def update(self, argumentMap, requestBody):
-        self.response.write('Called functions update, arguments:\n')
-        obj = entities.apiComponent().search("chips")
-        entities.apiComponent().update(obj.key().id(), obj.name, obj.stock - 1, obj.Step.key().id(), 12.0)
+            components = entities.apiComponent().compByStep(step.key().id())
+
+            componentsData = []
+            for component in components:
+                componentsData.append(self.serializableDataFromComponent(component))
+
+            stepData['components'] = componentsData
+
+            stepsData.append(stepData)
+
+        json.dump(stepsData, self.response)
+
+    def get_components(self, argumentMap):
+        components = entities.apiComponent().search(None)
+
+        componentsData = []
+        for component in components:
+            componentsData.append(self.serializableDataFromComponent(component))
+
+        json.dump(componentsData, self.response)
+
+    # def get_components_from_step_index(self, argumentMap):
+    #     requiredParams = ['step_index']
+    #     if not self.checkRequiredKeys(argumentMap, requiredParams):
+    #         self.response.write('Error, missing required key in POST data. Required keys are:\n')
+    #         for key in requiredKeys:
+    #             self.response.write(key + '\n')
+    #         return
+
+    # def update(self, argumentMap, requestBody):
+    #     self.response.write('Called functions update, arguments:\n')
+    #     obj = entities.apiComponent().search("chips")
+    #     entities.apiComponent().update(obj.key().id(), obj.name, obj.stock - 1, obj.Step.key().id(), 12.0)
 
     #
     # POST methods
@@ -174,7 +225,7 @@ class API(webapp2.RequestHandler):
             return
         else:
             # Recuperation de la key de la step
-            stepKey = matchingStep.key()
+            stepKey = matchingStep.key().id()
 
         # Ajout du component a la step
         entities.apiComponent().add(compName, compStock, stepKey, float(compPrice))
@@ -213,7 +264,7 @@ class API(webapp2.RequestHandler):
             return
         else:
             # Recuperation de la key de la step
-            stepKey = matchingStep.key()
+            stepKey = matchingStep.key().id()
 
         entities.apiStep().delete(stepKey)
 
@@ -248,7 +299,7 @@ class API(webapp2.RequestHandler):
             return
         else:
             # Recuperation de la key du component
-            compKey = matchingComp.key()
+            compKey = matchingComp.key().id()
 
         entities.apiComponent().delete(compKey)
 
