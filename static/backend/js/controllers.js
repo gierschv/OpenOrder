@@ -42,7 +42,7 @@ function ComponentsCtrl($location, $rootScope, $scope, Step) {
   $('.navbar li.nav-components').addClass('active');
 
   // Steps
-  $scope.steps = Step.query();
+  $scope.steps = Step.query({ api_key: $rootScope['profile']['api_key'] });
 
   // - Add new step
   $scope.addStep = function() {
@@ -51,15 +51,15 @@ function ComponentsCtrl($location, $rootScope, $scope, Step) {
     }
 
     // TODO Check result
-    Step.save({ name: $scope.newStepName, number: $scope.newStepIndex, type: $scope.newStepType });
+    Step.save({ api_key: $rootScope['profile']['api_key'], name: $scope.newStepName, number: $scope.newStepIndex, type: $scope.newStepType });
     $('#stepModal').modal('hide');
-    $scope.steps = Step.query();
+    $scope.steps = Step.query({ api_key: $rootScope['profile']['api_key'] });
   };
 
   // - Remove a step
   $scope.removeStep = function(id) {
-    Step.remove({ id: id });
-    $scope.steps = Step.query();
+    Step.remove({ api_key: $rootScope['profile']['api_key'], id: id });
+    $scope.steps = Step.query({ api_key: $rootScope['profile']['api_key'] });
   };
 }
 
