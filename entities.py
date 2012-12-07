@@ -66,8 +66,12 @@ class apiOrder():
 		O = Order(ingredient=listCom, dateCommand=dateBuy, User=User.get_by_id(id).key())
 		O.put()
 
-	def search():
-		pass
+	def getAll(self, pLimit):
+		q = Order.all()
+		if pLimit == None:
+			return q.fetch(limit=q.count())
+		else:
+			return q.fetch(limit=pLimit)
 
 	def getCurrentOrder(self, pLimit):
 		q = Order.all()
