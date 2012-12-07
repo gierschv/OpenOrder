@@ -144,7 +144,7 @@ textarea {
 }
 body {
   margin: 0;
-  font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+  font-family: "Helvetica Neue", Helvetica, "Open Sans", Arial, sans-serif;
   font-size: 14px;
   line-height: 20px;
   color: #333333;
@@ -795,7 +795,7 @@ input,
 button,
 select,
 textarea {
-  font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+  font-family: "Helvetica Neue", Helvetica, "Open Sans", Arial, sans-serif;
 }
 label {
   display: block;
@@ -3621,7 +3621,7 @@ input[type="submit"].btn.btn-mini {
 .navbar-search .search-query {
   margin-bottom: 0;
   padding: 4px 14px;
-  font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+  font-family: "Helvetica Neue", Helvetica, "Open Sans", Arial, sans-serif;
   font-size: 13px;
   font-weight: normal;
   line-height: 1;
@@ -4755,4 +4755,43 @@ a.badge:hover {
 }
 .affix {
   position: fixed;
+}
+h1,
+h2,
+h3 {
+  font-weight: 300;
+}
+h1,
+h2 {
+  padding: 0 0 25px 0;
+}
+h3 {
+  font-size: 20px;
+}
+form.no-margin {
+  margin: 0;
+}
+.navbar {
+  display: none;
+}
+.container.wrapper {
+  margin-top: 60px;
+}
+.ng-auth {
+  text-align: center;
+  font-weight: 300;
+  font-size: 30px;
+  margin: 100px 0 0 0;
+}
+.ng-auth img {
+  margin: 40px auto;
+  display: block;
+}
+.ng-home {
+  text-align: center;
+  margin: 200px 0 0 0;
+}
+.ng-home p {
+  font-size: 20px;
+  font-weight: 300;
 }
