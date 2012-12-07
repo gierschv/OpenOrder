@@ -69,8 +69,8 @@ class apiOrder():
 		q = favoritOrder.all()
 		return q.filter('User =', User.get_by_id(id).key()).order('-nbVote').fetch(limit = pLimit)
 
-	def delete(self, ):
-		O = db.get(key)
+	def delete(self, idOrder):
+		O = Order.get_by_id(kidOrder)
 		O.delete()
 	
 	def update(self, ingredient, idOrder, dateSoldOut, idUser):
@@ -165,3 +165,7 @@ class apiComponent():
 		else:
 			q = Component.all()
 			return q.filter('name =', pName).get()
+
+	def compByStep(self, id):
+		q = Component.all()
+		return q.filter('Step =', Step.get_by_id(id).key()).order('-name')
