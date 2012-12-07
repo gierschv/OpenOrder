@@ -71,7 +71,11 @@ class API(webapp2.RequestHandler):
             for func in mapping.keys():
                 self.response.write(func + '\n')
         else:
-            mapping[func](self.request.body)
+            args = {}
+            for argumentName in self.request.arguments():
+                args[argumentName] = self.request.get(argumentName)
+
+            mapping[func](args)
 
     #
     # Utils
@@ -236,71 +240,46 @@ class API(webapp2.RequestHandler):
     # DELETE methods
     #
 
-    def remove_step(self, requestBody):
-
-        requestData = json.loads(requestBody)
+    def remove_step(self, queryStringArguments):
 
         # Check si le nom de la step est present
-        requiredKeys = ['step']
-        if not self.checkRequiredKeys(requestBody, requiredKeys):
-            self.response.write('Error, missing required key in request. Required keys are:\n')
+        requiredKeys = ['id']
+        if not self.checkRequiredKeys(queryStringArguments, requiredKeys):
+            self.response.write('Error, missing required argument. Required arguments are:\n')
             for key in requiredKeys:
                 self.response.write(key + '\n')
             return
 
         # Recuperation du nom de la step
-        stepName = requestData.pop('step')
+        stepId = queryStringArguments.pop('id')
 
         # On previent qu'on ignore les donnees inutiles
-        for extraKey in componentDescription:
-            self.response.write('Ignoring extra key "' + extraKey + '"\n')
+        for extraArg in queryStringArguments:
+            self.response.write('Ignoring extra argument "' + extraArg + '"\n')
 
-        # Recuperation de l'objet step
-        matchingStep = entities.apiStep().search(stepName)
-        stepKey = None
+        # Suppression de la step
+        entities.apiStep().delete(long(stepId))
 
-        if matchingStep == None:
-            self.response.write('Step not found\n')
-            return
-        else:
-            # Recuperation de la key de la step
-            stepKey = matchingStep.key().id()
+        self.response.write('Step ' + str(stepId) + ' removed successfully.')
 
-        entities.apiStep().delete(stepKey)
-
-        self.response.write('Step "' + stepName + '" removed successfully.')
-
-    def remove_component(self, requestBody):
-
-        self.response.write('Request body: "' + requestBody + '"\n')
-        componentDescription = json.loads(requestBody)
+    def remove_component(self, queryStringArguments):
 
         # Check si le nom du component est present
-        requiredKeys = ['component']
-        if not self.checkRequiredKeys(componentDescription, requiredKeys):
-            self.response.write('Error, missing required key in request. Required keys are:\n')
+        requiredKeys = ['id']
+        if not self.checkRequiredKeys(queryStringArguments, requiredKeys):
+            self.response.write('Error, missing required argument. Required arguments are:\n')
             for key in requiredKeys:
                 self.response.write(key + '\n')
             return
 
         # Recuperation du nom du component
-        compName = componentDescription.pop('component')
+        compId = queryStringArguments.pop('id')
 
         # On previent qu'on ignore les donnees inutiles
-        for extraKey in componentDescription:
-            self.response.write('Ignoring extra key "' + extraKey + '"\n')
+        for extraArg in queryStringArguments:
+            self.response.write('Ignoring extra argument "' + extraArg + '"\n')
 
-        # Recuperation de l'objet component
-        matchingComp = entities.apiComponent().search(compName)
-        compKey = None
+        # Suppression du component
+        entities.apiComponent().delete(long(compId))
 
-        if matchingComp == None:
-            self.response.write('Component not found\n')
-            return
-        else:
-            # Recuperation de la key du component
-            compKey = matchingComp.key().id()
-
-        entities.apiComponent().delete(compKey)
-
-        self.response.write('comp "' + compName + '" removed successfully.')
+        self.response.write('Component ' + str(compId) + ' removed successfully.')
