@@ -54,11 +54,13 @@ class API(webapp2.RequestHandler):
             mapping[func](self.request.body)
 
     def delete(self):
-        self.response.headers['Content-Type'] = 'test/plain'
+        self.response.headers['Content-Type'] = 'text/plain'
 
         mapping = {
-            'remove_step':      self.remove_step,
-            'remove_component': self.remove_component
+            'step'            : self.remove_step,
+            'step.json'       : self.remove_step,
+            'component'       : self.remove_component,
+            'component.json'  : self.remove_component
         }
 
         # Recuperation de la methode appelee
