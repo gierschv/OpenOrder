@@ -29,17 +29,30 @@ function HomeCtrl($location, $rootScope) {
   }
 
   $('.navbar').show();
-  $('.navbar li.active').removeClass('active');
+  $('.navbar li.active').removeClass('active'); 
   $('.navbar li.nav-home').addClass('active');
 }
 
-function ComponentsCtrl($location, $rootScope) {
+function ComponentsCtrl($location, $rootScope, $scope, Step) {
+  // Init & UI
   if ($rootScope['profile'] === undefined) {
     return $location.path('/auth');
   }
-
   $('.navbar li.active').removeClass('active');
   $('.navbar li.nav-components').addClass('active');
+
+  // Steps
+  // $scope.step = Step.query();
+  // console.log($scope.step);
+
+  // - Add new step
+  $scope.addStep = function() {
+    if ($scope.newStepName === undefined || $scope.newStepIndex === undefined || $scope.newStepType === undefined) {
+      return false;
+    }
+
+    console.log(Step.save({ name: $scope.newStepName, number: $scope.newStepIndex, type: $scope.newStepType }));
+  };
 }
 
 function OrdersCtrl($location, $rootScope) {

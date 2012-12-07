@@ -4757,9 +4757,19 @@ a.badge:hover {
   position: fixed;
 }
 h1,
-h2 {
+h2,
+h3 {
   font-weight: 300;
+}
+h1,
+h2 {
   padding: 0 0 25px 0;
+}
+h3 {
+  font-size: 20px;
+}
+form.no-margin {
+  margin: 0;
 }
 .navbar {
   display: none;
