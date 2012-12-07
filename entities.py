@@ -13,6 +13,7 @@ class User(db.Model):
 	first_name = db.StringProperty()
 	last_name = db.StringProperty()
 	active = db.BooleanProperty()
+	admin = db.BooleanProperty()
 
 class Step(db.Model):
 	name = db.StringProperty()
@@ -38,6 +39,17 @@ class Order(db.Model):
 	Sold = db.DateProperty()
 	User = db.ReferenceProperty(User)
 
+class apiUser():
+	def get(self, id):
+		return User.get_by_id(id)
+
+	def delete(self, idUser):
+		User.get_by_id(idUser).delete()
+
+	def getApiKey(self, ApiKey):
+		q = User.all()
+		return q.filter('api_key =', ApiKey).get()
+
 #
 #	Class to get back any kind of entities. request is based on the key, useful with foreign key
 #
@@ -54,8 +66,12 @@ class apiOrder():
 		O = Order(ingredient=listCom, dateCommand=dateBuy, User=User.get_by_id(id).key())
 		O.put()
 
-	def search():
-		pass
+	def getAll(self, pLimit):
+		q = Order.all()
+		if pLimit == None:
+			return q.fetch(limit=q.count())
+		else:
+			return q.fetch(limit=pLimit)
 
 	def getCurrentOrder(self, pLimit):
 		q = Order.all()
@@ -79,6 +95,9 @@ class apiOrder():
 		O.Sold = dateSoldOut
 		O.User = User().get_by_id(idUser).key()
 		O.put()
+
+	def get(self, id):
+		return Order.get_by_id(id)
 
 #
 #	Class apiFavoriteOder, manage operation on users favortie Order
@@ -105,6 +124,9 @@ class apifavoriteOrder():
 		O.nbVote = pNbVote
 		O.put()
 
+	def get(self, id):
+		return favoritOrder.get_by_id(id)
+
 #
 #	Class Api Step, Step are managed by this class, BEWARE with delete when the function 
 #	is called all the component linked with are dropped.
@@ -117,9 +139,13 @@ class apiStep():
 
 	def delete(self, idStep):
 		c = Component.all()
-		c.filter('Step =', Step.get_by_id(idStep).key()).delete()
-		q = Step.get_by_id(idStep)
-		q.delete()
+		step = Step.get_by_id(idStep)
+
+		if step != None:
+			c.filter('Step =', step.key())
+			for component in c.run():
+				component.delete()
+			step.delete()
 
 	def search(self, pName):
 		if pName is None:
@@ -142,6 +168,9 @@ class apiStep():
 		q = Step.all()
 		return q.filter('index =', index).get()
 
+	def get(self, id):
+		return Step.get_by_id(id)
+
 class apiComponent():
 	def add(self, Name, Stock, idStep, pPrix):
 		C = Component(name = Name, stock = Stock, prix = pPrix, Step = Step.get_by_id(idStep).key())
@@ -149,7 +178,8 @@ class apiComponent():
 
 	def delete(self, idCom):
 		q = Component.get_by_id(idCom)
-		q.delete()
+		if q != None:
+			q.delete()
 
 	def update(self, idCom, Name, Stock, idStep, pPrix):
 		com = Component.get_by_id(idCom)
@@ -169,3 +199,6 @@ class apiComponent():
 	def compByStep(self, id):
 		q = Component.all()
 		return q.filter('Step =', Step.get_by_id(id).key()).order('-name')
+
+	def get(self, id):
+		return Component.get_by_id(id)

@@ -3,35 +3,27 @@
 
     <div class="tabbable">
         <div class="pull-right">
-            <a data-toggle="modal" href="#sectionModal" class="btn "><i class="icon-plus"></i> Add a new step</a>
+            <a data-toggle="modal" href="#stepModal" class="btn"><i class="icon-plus"></i> Add a new step</a>
         </div>
         
         <ul class="nav nav-tabs">
-            <li class=""><a href="#tab1" data-toggle="tab">Step 1</a></li>
-            <li class="active"><a href="#tab2" data-toggle="tab">Step 2</a></li>
-            <li class=""><a href="#tab3" data-toggle="tab">Step 3</a></li>
+            <li ng-repeat="step in steps"><a href="#tab{{step.index}}" data-toggle="tab">{{step.name}}</a></li>
         </ul>
 
         <div class="tab-content">
-            <div class="tab-pane" id="tab1">
-                <p>I'm in Step 1.</p>
-            </div>
-            <div class="tab-pane active" id="tab2">
-                <p>Howdy, I'm in Step 2.</p>
+            <div ng-repeat="step in steps" class="tab-pane" id="tab{{step.index}}">
+                {{ step }}
 
                 <div class="pull-right btn-group">
-                    <a href="#" class="btn"><i class="icon-edit"></i> Step properties</i></a>
-                    <a href="#" class="btn btn-danger"><i class="icon-remove icon-white"></i> Remove section</i></a>
+                    <a data-toggle="modal" href="#componentModal" class="btn"><i class="icon-plus"></i> Add a new component</a>
+                    <a href="" ng-click="removeStep(step.id)" class="btn btn-danger"><i class="icon-remove icon-white"></i> Remove step</i></a>
                 </div>
-            </div>
-            <div class="tab-pane" id="tab3">
-                <p>This is Step 3.</p>
             </div>
         </div>
     </div>
 </div>
 
-<div id="sectionModal" class="modal hide fade">
+<div id="stepModal" class="modal hide fade">
     <form ng-submit="addStep()" class="no-margin">
         <div class="modal-header">
             <button type="button" class="close" data-dismiss="modal">&times;</button>
@@ -67,6 +59,24 @@
         <div class="modal-footer">
             <button class="btn" data-dismiss="modal">Cancel</button>
             <button class="btn btn-primary"><i class="icon icon-white icon-plus"></i> Add this step</button>
+        </div>
+    </form>
+</div>
+
+<div id="componentModal" class="modal hide fade">
+    <form ng-submit="addComponent()" class="no-margin">
+        <div class="modal-header">
+            <button type="button" class="close" data-dismiss="modal">&times;</button>
+            <h3>Add a component</h3>
+        </div>
+        <div class="modal-body">
+            <div class="form-horizontal">
+                
+            </div>
+        </div>
+        <div class="modal-footer">
+            <button class="btn" data-dismiss="modal">Cancel</button>
+            <button class="btn btn-primary"><i class="icon icon-white icon-plus"></i> Add this component</button>
         </div>
     </form>
 </div>
