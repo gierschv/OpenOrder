@@ -13,6 +13,7 @@ class User(db.Model):
 	first_name = db.StringProperty()
 	last_name = db.StringProperty()
 	active = db.BooleanProperty()
+	admin = db.BooleanProperty()
 
 class Step(db.Model):
 	name = db.StringProperty()
@@ -38,6 +39,17 @@ class Order(db.Model):
 	Sold = db.DateProperty()
 	User = db.ReferenceProperty(User)
 
+class apiUser():
+	def get(self, id):
+		return User.get_by_id(id)
+
+	def delete(self, idUser):
+		User.get_by_id(idUser).delete()
+
+	def getApiKey(self, ApiKey):
+		q = User.all()
+		return q.filter('api_key =', ApiKey).get()
+
 #
 #	Class to get back any kind of entities. request is based on the key, useful with foreign key
 #
@@ -54,8 +66,12 @@ class apiOrder():
 		O = Order(ingredient=listCom, dateCommand=dateBuy, User=User.get_by_id(id).key())
 		O.put()
 
-	def search():
-		pass
+	def getAll(self, pLimit):
+		q = Order.all()
+		if pLimit == None:
+			return q.fetch(limit=q.count())
+		else:
+			return q.fetch(limit=pLimit)
 
 	def getCurrentOrder(self, pLimit):
 		q = Order.all()
