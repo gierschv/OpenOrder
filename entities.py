@@ -80,6 +80,9 @@ class apiOrder():
 		O.User = User().get_by_id(idUser).key()
 		O.put()
 
+	def get(self, id):
+		return Order.get_by_id(id)
+
 #
 #	Class apiFavoriteOder, manage operation on users favortie Order
 #	Link are made on User and Component
@@ -104,6 +107,9 @@ class apifavoriteOrder():
 		O.User = User.get_by_id(idUser).key()
 		O.nbVote = pNbVote
 		O.put()
+
+	def get(self, id):
+		return favoritOrder.get_by_id(id)
 
 #
 #	Class Api Step, Step are managed by this class, BEWARE with delete when the function 
@@ -142,6 +148,9 @@ class apiStep():
 		q = Step.all()
 		return q.filter('index =', index).get()
 
+	def get(self, id):
+		return Step.get_by_id(id)
+
 class apiComponent():
 	def add(self, Name, Stock, idStep, pPrix):
 		C = Component(name = Name, stock = Stock, prix = pPrix, Step = Step.get_by_id(idStep).key())
@@ -169,3 +178,6 @@ class apiComponent():
 	def compByStep(self, id):
 		q = Component.all()
 		return q.filter('Step =', Step.get_by_id(id).key()).order('-name')
+
+	def get(self, id):
+		return Component.get_by_id(id)
