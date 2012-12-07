@@ -85,6 +85,24 @@ class API(webapp2.RequestHandler):
 
         return False if missingRequiredKey else True
 
+    def serializableDataFromComponent(self, component):
+        componentData = {
+            'name'  : component.name,
+            'stock' : component.stock,
+            'price' : component.prix,
+            'id'    : component.key().id()
+        }
+        return componentData
+
+    def serializableDataFromStep(self, step):
+        stepData = {
+            'name'  : step.name,
+            'index' : step.number,
+            'type'  : step.type,
+            'id'    : step.key().id()
+        }
+        return stepData
+
     #
     # GET methods
     #
@@ -99,27 +117,26 @@ class API(webapp2.RequestHandler):
         steps = entities.apiStep().search(None)
         stepsData = []
         for step in steps:
-            stepData = {
-                'name'  : step.name,
-                'index' : step.number,
-                'type'  : step.type,
-                'id'    : step.key().id()
-            }
+            stepData = self.serializableDataFromStep(step)
+
+            components = entities.apiComponent().compByStep(step.key().id())
+
+            componentsData = []
+            for component in components:
+                componentsData.append(self.serializableDataFromComponent(component))
+
+            stepData['components'] = componentsData
+
             stepsData.append(stepData)
 
         json.dump(stepsData, self.response)
 
     def get_components(self, argumentMap):
         components = entities.apiComponent().search(None)
+
         componentsData = []
         for component in components:
-            compData = {
-                'name'  : component.name,
-                'stock' : component.stock,
-                'price' : component.prix,
-                'id'    : component.key().id()
-            }
-            componentsData.append(compData)
+            componentsData.append(self.serializableDataFromComponent(component))
 
         json.dump(componentsData, self.response)
 
