@@ -12,10 +12,10 @@ class API(webapp2.RequestHandler):
     	self.response.headers['Content-Type'] = 'application/json'
 
     	mapping = {
-            'steps' : self.get_steps,
-            'steps.json' : self.get_steps,
-            'components' : self.get_components,
-            'components.json' : self.get_components
+            'step' : self.get_steps,
+            'step.json' : self.get_steps,
+            'component' : self.get_components,
+            'component.json' : self.get_components
 #            'get_components_from_step_index' : get_components_from_step_index
     	}
 
@@ -36,13 +36,11 @@ class API(webapp2.RequestHandler):
     def post(self):
         self.response.headers['Content-Type'] = 'text/plain'
 
-        if 'data' not in self.request.POST:
-            self.response.write('Missing "data" key in POST variables')
-            return
-
         mapping = {
-            'add_step': self.add_step,
-            'add_component': self.add_component
+            'step'          : self.add_step,
+            'step.json'     : self.add_step,
+            'component'     : self.add_component,
+            'component.json': self.add_component
         }
 
         # Recuperation de la methode appelee
@@ -53,7 +51,7 @@ class API(webapp2.RequestHandler):
             for func in mapping.keys():
                 self.response.write(func + '\n')
         else:
-            mapping[func](self.request.POST['data'])
+            mapping[func](self.request.body)
 
     def delete(self):
         self.response.headers['Content-Type'] = 'test/plain'
@@ -168,7 +166,7 @@ class API(webapp2.RequestHandler):
             return
 
         # Check si tous les champs sont presents dans les donnees POST
-        requiredKeys = ['name', 'index', 'type']
+        requiredKeys = ['name', 'number', 'type']
         if not self.checkRequiredKeys(postData, requiredKeys):
             self.response.write('Error, missing required key in POST data. Required keys are:\n')
             for key in requiredKeys:
@@ -177,14 +175,14 @@ class API(webapp2.RequestHandler):
 
         # Recuperation des donnees utiles
         stepName  = stepDescription.pop('name')
-        stepIndex = stepDescription.pop('index')
+        stepIndex = stepDescription.pop('number')
         stepType  = stepDescription.pop('type')
 
         # On previent qu'on ignore les donnees inutiles
         for extraKey in stepDescription:
             self.response.write('Ignoring extra key "' + extraKey + '"\n')
 
-        entities.apiStep().add(stepName, stepIndex, stepType)
+        entities.apiStep().add(stepName, long(stepIndex), stepType)
 
         self.response.write('Step "' + stepName + '" added successfully.\n')
 
@@ -228,7 +226,7 @@ class API(webapp2.RequestHandler):
             stepKey = matchingStep.key().id()
 
         # Ajout du component a la step
-        entities.apiComponent().add(compName, compStock, stepKey, float(compPrice))
+        entities.apiComponent().add(compName, long(compStock), stepKey, float(compPrice))
 
         self.response.write('Component "' + compName + '" successfully added to step "' + compStep + '"\n')
 
