@@ -220,21 +220,10 @@ class API(webapp2.RequestHandler):
         for extraKey in componentDescription:
             self.response.write('Ignoring extra key "' + extraKey + '"\n')
 
-        # Recuperation de la step
-        matchingStep = entities.apiStep().search(compStep)
-        stepKey = None
-
-        if matchingStep == None:
-            self.response.write('Step not found\n')
-            return
-        else:
-            # Recuperation de la key de la step
-            stepKey = matchingStep.key().id()
-
         # Ajout du component a la step
-        entities.apiComponent().add(compName, long(compStock), stepKey, float(compPrice))
+        entities.apiComponent().add(compName, long(compStock), long(compStep), float(compPrice))
 
-        self.response.write('Component "' + compName + '" successfully added to step "' + compStep + '"\n')
+        self.response.write('Component "' + compName + '" successfully added to step ' + str(compStep) + '\n')
 
     #
     # DELETE methods
