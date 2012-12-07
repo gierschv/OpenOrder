@@ -178,7 +178,8 @@ class apiComponent():
 
 	def delete(self, idCom):
 		q = Component.get_by_id(idCom)
-		q.delete()
+		if q != None:
+			q.delete()
 
 	def update(self, idCom, Name, Stock, idStep, pPrix):
 		com = Component.get_by_id(idCom)
