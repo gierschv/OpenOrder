@@ -52,6 +52,7 @@ function ComponentsCtrl($location, $rootScope, $scope, Step) {
     }
 
     console.log(Step.save({ name: $scope.newStepName, number: $scope.newStepIndex, type: $scope.newStepType }));
+    
   };
 }
 
