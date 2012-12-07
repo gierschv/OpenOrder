@@ -139,9 +139,13 @@ class apiStep():
 
 	def delete(self, idStep):
 		c = Component.all()
-		c.filter('Step =', Step.get_by_id(idStep).key()).delete()
-		q = Step.get_by_id(idStep)
-		q.delete()
+		step = Step.get_by_id(idStep)
+
+		if step != None:
+			c.filter('Step =', step.key())
+			for component in c.run():
+				component.delete()
+			step.delete()
 
 	def search(self, pName):
 		if pName is None:
