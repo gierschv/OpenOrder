@@ -4777,6 +4777,9 @@ form.no-margin {
 .container.wrapper {
   margin-top: 60px;
 }
+table th.actions {
+  width: 40px;
+}
 .ng-auth {
   text-align: center;
   font-weight: 300;

@@ -1,6 +1,6 @@
 'use strict';
 
-var app = angular.module('openorder', ['ui', 'openorderServices']).
+var app = angular.module('openorder', ['openorderServices']).
   config(['$routeProvider', function($routeProvider) {
   $routeProvider.
       when('/auth', { templateUrl: '/backend/_auth.html', controller: AuthCtrl }).
@@ -10,7 +10,6 @@ var app = angular.module('openorder', ['ui', 'openorderServices']).
       when('/orders', { templateUrl: '/backend/_orders.html', controller: OrdersCtrl }).
       otherwise({redirectTo: '/auth'});
 }]);
-
 
 app.run(function($rootScope) {
   // Facebook init

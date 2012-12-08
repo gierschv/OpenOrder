@@ -7,15 +7,35 @@
         </div>
         
         <ul class="nav nav-tabs">
-            <li ng-repeat="step in steps"><a href="#tab{{step.index}}" data-toggle="tab">{{step.name}}</a></li>
+            <li ng-repeat="step in steps" step-id="{{step.id}}"><a href="#tab{{step.index}}" data-toggle="tab">{{step.name}}</a></li>
         </ul>
 
         <div class="tab-content">
             <div ng-repeat="step in steps" class="tab-pane" id="tab{{step.index}}">
-                {{ step }}
-
+                <table class="table table-striped table-hover">
+                    <thead>
+                        <tr>
+                            <th>Name</th>
+                            <th>Price</th>
+                            <th>Stock</th>
+                            <th class="actions">&nbsp;</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr ng-repeat="component in step.components">
+                            <td>{{component.name}}</td>
+                            <td>{{component.price}}</td>
+                            <td>{{component.stock}}</td>
+                            <td>
+                                <a href="" ng-click="editComponent($parent.$index, $index, component.id)"><i class="icon icon-edit"></i></a>
+                                <a href="" ng-click="removeComponent(component.id)"><i class="icon icon-remove"></i></a>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+                
                 <div class="pull-right btn-group">
-                    <a data-toggle="modal" href="#componentModal" class="btn"><i class="icon-plus"></i> Add a new component</a>
+                    <a href="" ng-click="addComponent()" class="btn"><i class="icon-plus"></i> Add a new component</a>
                     <a href="" ng-click="removeStep(step.id)" class="btn btn-danger"><i class="icon-remove icon-white"></i> Remove step</i></a>
                 </div>
             </div>
@@ -27,7 +47,7 @@
     <form ng-submit="addStep()" class="no-margin">
         <div class="modal-header">
             <button type="button" class="close" data-dismiss="modal">&times;</button>
-            <h3>Add a step</h3>
+            <h3>Step</h3>
         </div>
         <div class="modal-body">
             <div class="form-horizontal">
@@ -58,25 +78,44 @@
         </div>
         <div class="modal-footer">
             <button class="btn" data-dismiss="modal">Cancel</button>
-            <button class="btn btn-primary"><i class="icon icon-white icon-plus"></i> Add this step</button>
+            <button type="submit" class="btn btn-primary"><i class="icon icon-white icon-plus"></i> Add this step</button>
         </div>
     </form>
 </div>
 
 <div id="componentModal" class="modal hide fade">
-    <form ng-submit="addComponent()" class="no-margin">
+    <form ng-submit="editComponentProcess()" class="no-margin">
         <div class="modal-header">
             <button type="button" class="close" data-dismiss="modal">&times;</button>
-            <h3>Add a component</h3>
+            <h3>Component</h3>
         </div>
         <div class="modal-body">
             <div class="form-horizontal">
-                
+                <div class="control-group">
+                    <label class="control-label">Name :</label>
+                    <div class="controls">
+                        <input type="text" ng-model="componentName" />
+                    </div>
+                </div>
+
+                <div class="control-group">
+                    <label class="control-label">Price :</label>
+                    <div class="controls">
+                        <input type="text" ng-model="componentPrice" />
+                    </div>
+                </div>
+
+                <div class="control-group">
+                    <label class="control-label">Stock :</label>
+                    <div class="controls">
+                        <input type="text" ng-model="componentStock" />
+                    </div>
+                </div>
             </div>
         </div>
         <div class="modal-footer">
             <button class="btn" data-dismiss="modal">Cancel</button>
-            <button class="btn btn-primary"><i class="icon icon-white icon-plus"></i> Add this component</button>
+            <button type="submit" class="btn btn-primary"><i class="icon icon-white icon-ok"></i> Validation</button>
         </div>
     </form>
 </div>
