@@ -9,32 +9,36 @@ $(document).ready(function() {
   });
  
   var accessToken, profile = {};
-  var eventLogin = function(response) {
-    if (response.status === 'connected') {
-      if (profile.api_key === undefined) {
-        console.log('pass');
-        $.get('/api/auth', response.authResponse , function (data) {
+	var eventLogin = function(response) {
+		if (response.status === 'connected') {
+			accessToken = response.authResponse.accessToken;
+			var url_friends =  "https://graph.facebook.com/fql?q=SELECT%20name,%20uid,%20pic_square%20FROM%20user%20WHERE%20has_added_app=1%20and%20uid%20IN%20(SELECT%20uid2%20FROM%20friend%20WHERE%20uid1%20=%20805037276)&access_token="+ accessToken;
+			alreadyConnected = 1;
+			$.get(url_friends, null, function (data) {
+				friends_obj = $.parseJSON(data);
+				for (i = 0; i < 2; i++) {
+					$("#friends_list").append("<li><a href=''><img id='friend_pic_"+i+"' src='"+friends_obj.data[i].pic_square+"' align='middle'/><h3 id='friend_name_" + i + "'>"+friends_obj.data[i].name+"</h3></a></li>").trigger("create");
+				}
+				$("#friends_list").append("<li><a href='#friendsAll'><h3 id='friends_all'> All my friends </h3></a></li>").trigger("create");
+				$("#friends_list").listview("refresh");
+				for (i = 0; i < friends_obj.data.length; i++) {
+					$("#friends_all_page").append("<li><a href=''><h3 id='friend_name_" + i + "'>"+friends_obj.data[i].name+"</h3><img id='friend_pic_"+i+"' src='"+friends_obj.data[i].pic_square+"' /></a></li>").trigger("create");
+				}
+			});
+			if (profile.api_key === undefined) {
+				$.get('/api/auth', response.authResponse , function (data) {
           profile = JSON.parse(data);
           $.mobile.changePage("#homeFB", { transition: "slideup" });
         }); 
-      }
+			}
     }
     else {
       $.mobile.changePage('#login',  { transition: "slideup" });
     }
-
-    // console.log(response.authResponse);
-    
-    // $.get('https://graph.facebook.com/me/friends?access_token=' + response.authResponse.accessToken, null, function (data) {
-    //  console.log('hello');
-    //  console.log(data);
-    // });
-
-
-    //$.get()
-    //$fql_queryurl"SELECT uid FROM user WHERE has_added_app=1 and uid IN (SELECT uid2 FROM friend WHERE uid1 = $user)"
-    // /fql?q=query 
-  };
+	}
+	
+	FB.Event.subscribe('auth.authResponseChange', eventLogin);
+	FB.getLoginStatus(eventLogin);
 
   // Facebook events
   FB.Event.subscribe('auth.authResponseChange', eventLogin);
