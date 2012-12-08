@@ -139,7 +139,9 @@ class apiStep():
 
 	def delete(self, idStep):
 		c = Component.all()
-		c.filter('Step =', Step.get_by_id(idStep).key()).delete()
+		c.filter('Step =', Step.get_by_id(idStep).key())
+		for toto in c.run():
+			toto.delete()
 		q = Step.get_by_id(idStep)
 		q.delete()
 
