@@ -167,7 +167,7 @@ class API(webapp2.RequestHandler):
         if 'id' in argumentMap:
             order = entities.apiOrder().get(long(argumentMap['id']))
             if order:
-                json.dump(self.serializableDataFromOrder(order))
+                json.dump(self.serializableDataFromOrder(order), self.response)
         else:
             orders = entities.apiOrder().getAll(None)
 
