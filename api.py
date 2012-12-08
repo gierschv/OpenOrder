@@ -124,7 +124,7 @@ class API(webapp2.RequestHandler):
 
         orderData = {
             'dateCreated' : time.mktime(order.dateCommand.timetuple()),
-            'dateSold'    : order.Sold,
+            'dateSold'    : time.mktime(order.Sold.timetuple()) if order.Sold else None,
             'components'  : componentsIds,
             'user'        : order.User.key().name() if order.User else None,
             'id'          : order.key().id()
@@ -165,19 +165,31 @@ class API(webapp2.RequestHandler):
 
     def get_orders(self, argumentMap):
 
-        # All orders of just a specific one
-        if 'id' in argumentMap:
-            order = entities.apiOrder().get(long(argumentMap['id']))
-            if order:
-                json.dump(self.serializableDataFromOrder(order), self.response)
+        if 'filter' in argumentMap:
+            filters = {
+                'sold':   lambda: entities.apiOrder().getSoldOrder(None),
+                'unsold': lambda: entities.apiOrder().getCurrentOrder(None)
+            }
+            filter = argumentMap['filter']
+            if filter not in filters:
+                self.response.write('Warning: Ignoring unrecognized specified filter "' + argumentMap['filter'] + '".\n')
+            else:
+                orders = [self.serializableDataFromOrder(order) for order in filters[filter]()]
+                json.dump(orders, self.response)
         else:
-            orders = entities.apiOrder().getAll(None)
+            # All orders of just a specific one
+            if 'id' in argumentMap:
+                order = entities.apiOrder().get(long(argumentMap['id']))
+                if order:
+                    json.dump(self.serializableDataFromOrder(order), self.response)
+            else:
+                orders = entities.apiOrder().getAll(None)
 
-            ordersData = []
-            for order in orders:
-                ordersData.append(self.serializableDataFromOrder(order))
+                ordersData = []
+                for order in orders:
+                    ordersData.append(self.serializableDataFromOrder(order))
 
-            json.dump(ordersData, self.response)
+                json.dump(ordersData, self.response)
 
     #
     # POST methods

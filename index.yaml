@@ -15,3 +15,9 @@ indexes:
   - name: Step
   - name: name
     direction: desc
+
+- kind: Order
+  properties:
+  - name: Sold
+  - name: dateCommand
+    direction: desc

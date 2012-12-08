@@ -81,6 +81,10 @@ class apiOrder():
 		q = Order.all()
 		return q.filter('Sold =', None).order('-dateCommand').fetch(limit=pLimit)
 
+	def getSoldOrder(self, pLimit):
+		q = Order.all()
+		return q.filter('Sold !=', None).order('-Sold').fetch(limit=pLimit)
+
 	def getUserOrder(self, id, pLimit):
 		q = Order.all()
 		return q.filter('User =', User.get_by_key_name(id).key()).order('-dateCommand').fetch(limit = pLimit)
