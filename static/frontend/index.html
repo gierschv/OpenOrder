@@ -18,12 +18,9 @@
 
 	<!-- Start of first page: #login -->
 	<div data-role="page" id="login">
-		<!-- <div data-role="header">
-			<h1><img src="/static/frontend/resources/images/logo-250.png"></h1>
-		</div>-->
 		<div data-role="content">
 			<div class="logo"><img src="/static/frontend/resources/images/logo-250.png"></div>
-			<a href="#homeFB" data-role="button" data-theme="b" class="FBLogin">Use my Facebook account to start ordering</a>
+			<a href="#homeFB" data-role="button" data-theme="b" class="FBLogin">Use my Facebook account</a>
 			<a href="#home" data-role="button">I don't have a Facebook account</a>
 		</div>
 	</div>
@@ -31,12 +28,16 @@
 	<!-- Start of second page: #homeFB -->
 	<div data-role="page" id="homeFB">
 		<div data-role="header">
-			<!-- <img src="resources/images/bag150.png" alt="some_text"> -->
+			<h1 class="logo"><img src="/static/frontend/resources/images/logo-100.png"></h1>
 		</div><!-- /header -->
 		<div data-role="content">	
-			<h1>New order</h1>
-			<h2>Account</h2>
 			<ul data-role="listview">
+				<li>
+					<a href="">
+						<h3>New order</h3>
+						<p>Start a new order</p>
+					</a>
+				</li>
 				<li>
 					<h3>My last orders</h3>
 					<p>Re-order my previous commands.</p>
@@ -59,7 +60,7 @@
 					</ul>
 				</li>
 			</ul>
-			<h2>Friends</h2>
+			<h4>Friends</h4>
 			<ul data-role="listview">
 				<li>
 					<h3>One of my friend</h3>

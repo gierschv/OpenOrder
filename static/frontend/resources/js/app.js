@@ -40,5 +40,8 @@ $(document).ready(function() {
 	FB.Event.subscribe('auth.authResponseChange', eventLogin);
 	FB.getLoginStatus(eventLogin);
 
-	//$('.FBLogin').click(FB.login());
+	$('.FBLogin').click(function() {
+		FB.login();
+		return false;
+	});
 });
