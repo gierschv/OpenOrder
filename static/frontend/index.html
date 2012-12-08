@@ -1,0 +1,105 @@
+<!DOCTYPE html> 
+<html> 
+<head> 
+	<title>My Page</title> 
+	<meta name="viewport" content="width=device-width, initial-scale=1"> 
+	<link rel="stylesheet" href="http://code.jquery.com/mobile/1.2.0/jquery.mobile-1.2.0.min.css" />
+	<link rel="stylesheet" href="resources/css/themes/openorder-default.css" />
+	<script src="http://code.jquery.com/jquery-1.8.2.min.js"></script>
+	<script src="http://code.jquery.com/mobile/1.2.0/jquery.mobile-1.2.0.min.js"></script>
+	<script src="app/js/script.js"></script>
+</head> 
+<body> 
+<!-- Start of first page: #one -->
+<div data-role="page" id="one">
+	<div data-role="header">
+		<img src="resources/images/bag150.png" alt="some_text">
+	</div><!-- /header -->
+	<div data-role="content">
+		<a href="#two" data-role="button" data-theme="b">Use my Facebook account to start ordering</a>
+		<a href="#two" data-role="button">I don't have a Facebook account</a>
+		<div class="fb-login-button" data-show-faces="true" data-width="200" data-max-rows="1" data-size='xlarge'></div>
+	</div><!-- /content -->
+</div><!-- /page one -->
+
+<!-- Start of second page: #two -->
+<div data-role="page" id="two">
+	<div data-role="header">
+		<img src="resources/images/bag150.png" alt="some_text">
+	</div><!-- /header -->
+	<div data-role="content">	
+		<h1>New order</h1>
+		<h2>Account</h2>
+		<ul data-role="listview">
+			<li>
+				<h3>My last orders</h3>
+				<p>Re-order my previous commands.</p>
+				<span class="ui-li-count">3</span>
+				<ul>
+					<li><a href="http://www.hristu.net/">Selection1</a></li>
+					<li><a href="http://www.hristu.net/">Selection2</a></li>
+					<li><a href="http://www.hristu.net/">Selection3</a></li>
+				</ul>
+			</li>
+			<li>
+
+				<h3>My favourites orders</h3>
+				<p>Re-order a favourite order.</p>
+				<span class="ui-li-count">3</span>
+				<ul>
+					<li><a href="http://www.hristu.net/">Selection1</a></li>
+					<li><a href="http://www.hristu.net/">Selection2</a></li>
+					<li><a href="http://www.hristu.net/">Selection3</a></li>
+				</ul>
+			</li>
+		</ul>
+		<h2>Friends</h2>
+		<ul data-role="listview">
+			<li>
+				<h3>One of my friend</h3>
+				
+				<img src="https://encrypted-tbn3.gstatic.com/images?q=tbn:ANd9GcRM3hBoJeCbAN8aGtDIPE2q4H-MCgYwkJjs9sqP2gj6sOYVaKkAXA" />
+				<ul>
+					<li><a href="index.html">Canary</a></li>
+					<li><a href="index.html">Cat</a></li>
+					<li><a href="index.html">Dog</a></li>
+					<li><a href="index.html">Gerbil</a></li>
+					<li><a href="index.html">Iguana</a></li>
+					<li><a href="index.html">Mouse</a></li>
+				</ul>
+			</li>
+			<li>
+				<h3>Another one</h3>
+				
+				<img src="https://encrypted-tbn3.gstatic.com/images?q=tbn:ANd9GcRM3hBoJeCbAN8aGtDIPE2q4H-MCgYwkJjs9sqP2gj6sOYVaKkAXA" />
+				<ul>
+					<li><a href="index.html">Blue</a></li>
+					<li><a href="index.html">Green</a></li>
+					<li><a href="index.html">Orange</a></li>
+					<li><a href="index.html">Purple</a></li>
+					<li><a href="index.html">Red</a></li>
+					<li><a href="index.html">Yellow</a></li>
+					<li><a href="index.html">Violet</a></li>
+				</ul>
+			</li>
+			<li>
+				<h3>All my friends</h3>
+				
+				<img src="https://encrypted-tbn3.gstatic.com/images?q=tbn:ANd9GcRM3hBoJeCbAN8aGtDIPE2q4H-MCgYwkJjs9sqP2gj6sOYVaKkAXA" />
+				
+				<ul>
+					<li><a href="index.html">Blue</a></li>
+					<li><a href="index.html">Green</a></li>
+					<li><a href="index.html">Orange</a></li>
+					<li><a href="index.html">Purple</a></li>
+					<li><a href="index.html">Red</a></li>
+					<li><a href="index.html">Yellow</a></li>
+					<li><a href="index.html">Violet</a></li>
+				</ul>
+			</li>
+		</ul>
+	</div><!-- /content -->
+</div><!-- /page two -->
+	<script src="//connect.facebook.net/en_US/all.js"></script>
+</body>
+</html>
