@@ -75,19 +75,20 @@ function ComponentsCtrl($location, $rootScope, $scope, $timeout, Step, Component
   };
 
   // Components
-  $scope.editComponentProcess = function() {
-    var stepId = $('.ng-components ul.nav li.active').attr('step-id');
-
-    if ($scope.componentName === undefined || $scope.componentPrice === undefined || $scope.componentStock === undefined) {
-      return false;
-    }
-    
-    var updateView = function() {
+  var stepId;
+  var updateView = function() {
       $('#componentModal').modal('hide');
       loadSteps(function() {
         $('.ng-components ul.nav li[step-id="' + stepId + '"] a').tab('show');
       });
     };
+
+  $scope.editComponentProcess = function() {
+    stepId = $('.ng-components ul.nav li.active').attr('step-id');
+
+    if ($scope.componentName === undefined || $scope.componentPrice === undefined || $scope.componentStock === undefined) {
+      return false;
+    }
 
     // TODO Check result
     Component.save({ api_key: $rootScope['profile']['api_key'],
@@ -104,7 +105,7 @@ function ComponentsCtrl($location, $rootScope, $scope, $timeout, Step, Component
     $scope.componentPrice = '';
     $scope.componentStock = '';
     $('#componentModal').modal('show');
-  }
+  };
 
   $scope.editComponent = function(stepIdx, componentIdx, componentId) {
     $scope.componentEditing = componentId;
@@ -112,6 +113,11 @@ function ComponentsCtrl($location, $rootScope, $scope, $timeout, Step, Component
     $scope.componentPrice = $scope.steps[stepIdx].components[componentIdx].price;
     $scope.componentStock = $scope.steps[stepIdx].components[componentIdx].stock;
     $('#componentModal').modal('show');
+  };
+
+  $scope.removeComponent = function(componentId) {
+    stepId = $('.ng-components ul.nav li.active').attr('step-id');
+    Component.remove({ id: componentId }, updateView);
   };
 }
 
