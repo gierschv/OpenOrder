@@ -43,12 +43,14 @@ class API(webapp2.RequestHandler):
         self.response.headers['Content-Type'] = 'text/plain'
 
         mapping = {
-            'step'          : self.update_step,
-            'step.json'     : self.update_step,
-            'component'     : self.update_component,
-            'component.json': self.update_component,
-            'order'         : self.update_order,
-            'order.json'    : self.update_order
+            'step'            : self.update_step,
+            'step.json'       : self.update_step,
+            'component'       : self.update_component,
+            'component.json'  : self.update_component,
+            'order'           : self.update_order,
+            'order.json'      : self.update_order,
+            'order/sell'      : self.sell_order,
+            'order.json/sell' : self.sell_order
         }
 
         # Recuperation de la methode appelee
@@ -327,6 +329,34 @@ class API(webapp2.RequestHandler):
         else:
             order = entities.apiOrder().add(componentsIds, datetime.datetime.fromtimestamp(orderDateCreation), str(orderUser))
             self.response.write(json.dumps({ 'orderId': order.key().id() }))
+
+    def sell_order(self):
+
+        # Decode JSON
+        data = {}
+        try:
+            data = json.loads(self.request.body)
+        except ValueError:
+            self.response.write('Invalid JSON')
+            return
+
+        # Get order id
+        if 'id' not in data:
+            self.response.write('Error: Missing order id.\n')
+            return
+
+        orderId = long(data['id'])
+
+        # Get sell date or set it to now
+        if 'date' in data:
+            dateSold = datetime.datetime.fromtimestamp(data['date'])
+        else:
+            dateSold = datetime.datetime.fromtimestamp(time.time())
+
+        # Set order as sold
+        entities.apiOrder().setSold(orderId, dateSold)
+
+        self.response.write(json.dumps({ 'success': True }))
 
     #
     # DELETE methods
