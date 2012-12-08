@@ -85,7 +85,7 @@ function ComponentsCtrl($location, $rootScope, $scope, $timeout, Step, Component
     var updateView = function() {
       $('#componentModal').modal('hide');
       loadSteps(function() {
-        $('.ng-components ul.nav li[step-id="1"] a').tab('show');
+        $('.ng-components ul.nav li[step-id="' + stepId + '"] a').tab('show');
       });
     };
 
