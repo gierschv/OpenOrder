@@ -25,10 +25,17 @@ handlers:
 # Frontend / Static
 - url: /frontend
   static_dir: static/frontend
-  
+
 # App
-- url: .*
+- url: /api/.*
   script: main.app
+
+# Redirect to frontend
+- url: /
+  static_files: static/frontend/index.html
+  upload: static/frontend/index.html
+- url: /.*
+  static_dir: static/frontend
 
 libraries:
 - name: webapp2

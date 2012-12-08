@@ -33,7 +33,7 @@ function HomeCtrl($location, $rootScope) {
   $('.navbar li.nav-home').addClass('active');
 }
 
-function ComponentsCtrl($location, $rootScope, $scope, Step) {
+function ComponentsCtrl($location, $rootScope, $scope, $timeout, Step, Component) {
   // Init & UI
   if ($rootScope['profile'] === undefined) {
     return $location.path('/auth');
@@ -42,7 +42,15 @@ function ComponentsCtrl($location, $rootScope, $scope, Step) {
   $('.navbar li.nav-components').addClass('active');
 
   // Steps
-  $scope.steps = Step.query({ api_key: $rootScope['profile']['api_key'] });
+  var loadSteps = function(callback) {
+    $scope.steps = Step.query({ api_key: $rootScope['profile']['api_key'] }, function() {
+      if (callback !== undefined) {
+        $timeout(callback);
+      }
+    });
+  };
+
+  loadSteps();
 
   // - Add new step
   $scope.addStep = function() {
@@ -51,15 +59,65 @@ function ComponentsCtrl($location, $rootScope, $scope, Step) {
     }
 
     // TODO Check result
-    Step.save({ api_key: $rootScope['profile']['api_key'], name: $scope.newStepName, number: $scope.newStepIndex, type: $scope.newStepType });
+    Step.save({ api_key: $rootScope['profile']['api_key'],
+                name: $scope.newStepName,
+                number: $scope.newStepIndex,
+                type: $scope.newStepType });
+
     $('#stepModal').modal('hide');
-    $scope.steps = Step.query({ api_key: $rootScope['profile']['api_key'] });
+    return loadSteps();
   };
 
   // - Remove a step
   $scope.removeStep = function(id) {
     Step.remove({ api_key: $rootScope['profile']['api_key'], id: id });
-    $scope.steps = Step.query({ api_key: $rootScope['profile']['api_key'] });
+    return loadSteps();
+  };
+
+  // Components
+  var stepId;
+  var updateView = function() {
+      $('#componentModal').modal('hide');
+      loadSteps(function() {
+        $('.ng-components ul.nav li[step-id="' + stepId + '"] a').tab('show');
+      });
+    };
+
+  $scope.editComponentProcess = function() {
+    stepId = $('.ng-components ul.nav li.active').attr('step-id');
+
+    if ($scope.componentName === undefined || $scope.componentPrice === undefined || $scope.componentStock === undefined) {
+      return false;
+    }
+
+    // TODO Check result
+    Component.save({ api_key: $rootScope['profile']['api_key'],
+                     id: $scope.componentEditing,
+                     step: stepId,
+                     name: $scope.componentName,
+                     price: $scope.componentPrice,
+                     stock: $scope.componentStock }, updateView);
+  };
+
+  $scope.addComponent = function() {
+    $scope.componentEditing = null;
+    $scope.componentName = '';
+    $scope.componentPrice = '';
+    $scope.componentStock = '';
+    $('#componentModal').modal('show');
+  };
+
+  $scope.editComponent = function(stepIdx, componentIdx, componentId) {
+    $scope.componentEditing = componentId;
+    $scope.componentName = $scope.steps[stepIdx].components[componentIdx].name;
+    $scope.componentPrice = $scope.steps[stepIdx].components[componentIdx].price;
+    $scope.componentStock = $scope.steps[stepIdx].components[componentIdx].stock;
+    $('#componentModal').modal('show');
+  };
+
+  $scope.removeComponent = function(componentId) {
+    stepId = $('.ng-components ul.nav li.active').attr('step-id');
+    Component.remove({ id: componentId }, updateView);
   };
 }
 

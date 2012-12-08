@@ -9,38 +9,44 @@ class API(webapp2.RequestHandler):
     #
 
     def get(self):
-    	self.response.headers['Content-Type'] = 'application/json'
-
     	mapping = {
-            'step' : self.get_steps,
-            'step.json' : self.get_steps,
-            'component' : self.get_components,
-            'component.json' : self.get_components
-#            'get_components_from_step_index' : get_components_from_step_index
+            'step'           : self.get_steps,
+            'step.json'      : self.get_steps,
+            'component'      : self.get_components,
+            'component.json' : self.get_components,
+            'order'          : self.get_orders,
+            'order.json'     : self.get_orders
     	}
 
         # Recuperation de la methode appelee
         func = self.request.path_info[len("/api/"):]
 
     	if func not in mapping:
-    		self.response.write('Supported functions:\n')
-    		for func in mapping.keys():
-    			self.response.write(func + '\n')
-    	else:
-    		args = {}
-    		for argumentName in self.request.arguments():
-    			args[argumentName] = self.request.get(argumentName)
+            self.abort(404)
 
-    		mapping[func](args)
+    		# self.response.write('Supported functions:\n')
+    		# for func in mapping.keys():
+    		# 	self.response.write(func + '\n')
+
+    	else:
+            self.response.headers['Content-Type'] = 'application/json'
+
+            args = {}
+            for argumentName in self.request.arguments():
+                args[argumentName] = self.request.get(argumentName)
+
+            mapping[func](args)
 
     def post(self):
         self.response.headers['Content-Type'] = 'text/plain'
 
         mapping = {
-            'step'          : self.add_step,
-            'step.json'     : self.add_step,
-            'component'     : self.add_component,
-            'component.json': self.add_component
+            'step'          : self.update_step,
+            'step.json'     : self.update_step,
+            'component'     : self.update_component,
+            'component.json': self.update_component,
+            'order'         : self.update_order,
+            'order.json'    : self.update_order
         }
 
         # Recuperation de la methode appelee
@@ -51,16 +57,18 @@ class API(webapp2.RequestHandler):
             for func in mapping.keys():
                 self.response.write(func + '\n')
         else:
-            mapping[func](self.request.body)
+            mapping[func]()
 
     def delete(self):
         self.response.headers['Content-Type'] = 'text/plain'
 
         mapping = {
-            'step'            : self.remove_step,
-            'step.json'       : self.remove_step,
-            'component'       : self.remove_component,
-            'component.json'  : self.remove_component
+            'step'           : self.remove_step,
+            'step.json'      : self.remove_step,
+            'component'      : self.remove_component,
+            'component.json' : self.remove_component,
+            'order'          : self.remove_order,
+            'order.json'     : self.remove_order
         }
 
         # Recuperation de la methode appelee
@@ -71,7 +79,11 @@ class API(webapp2.RequestHandler):
             for func in mapping.keys():
                 self.response.write(func + '\n')
         else:
-            mapping[func](self.request.body)
+            args = {}
+            for argumentName in self.request.arguments():
+                args[argumentName] = self.request.get(argumentName)
+
+            mapping[func](args)
 
     #
     # Utils
@@ -102,6 +114,20 @@ class API(webapp2.RequestHandler):
             'id'    : step.key().id()
         }
         return stepData
+
+    # TODO: Fix user dans orderData
+    def serializableDataFromOrder(self, order):
+        componentsIds = [componentKey.id() for componentKey in order.ingredient]
+        components = [entities.apiComponent().get(componentId) in componentsIds]
+
+        orderData = {
+            'dateCreated' : order.dateCommand,
+            'dateSold'    : order.Sold,
+            'components'  : components,
+            'user'        : 0
+        }
+
+        return orderData
 
     #
     # GET methods
@@ -140,6 +166,15 @@ class API(webapp2.RequestHandler):
 
         json.dump(componentsData, self.response)
 
+    def get_orders(self, argumentMap):
+        orders = entities.apiOrder().getAll(None)
+
+        ordersData = []
+        for order in orders:
+            ordersData.append(self.serializableDataFromOrder(order))
+
+        json.dump(ordersData, self.response)
+
     # def get_components_from_step_index(self, argumentMap):
     #     requiredParams = ['step_index']
     #     if not self.checkRequiredKeys(argumentMap, requiredParams):
@@ -157,19 +192,19 @@ class API(webapp2.RequestHandler):
     # POST methods
     #
 
-    def add_step(self, postData):
+    def update_step(self):
 
         # Decode le JSON pour recuperer les donnees qui concernent la step a creer
         stepDescription = {}
         try:
-            stepDescription = json.loads(postData)
+            stepDescription = json.loads(self.request.body)
         except ValueError:
             self.response.write('Invalid JSON')
             return
 
         # Check si tous les champs sont presents dans les donnees POST
         requiredKeys = ['name', 'number', 'type']
-        if not self.checkRequiredKeys(postData, requiredKeys):
+        if not self.checkRequiredKeys(stepDescription, requiredKeys):
             self.response.write('Error, missing required key in POST data. Required keys are:\n')
             for key in requiredKeys:
                 self.response.write(key + '\n')
@@ -179,28 +214,33 @@ class API(webapp2.RequestHandler):
         stepName  = stepDescription.pop('name')
         stepIndex = stepDescription.pop('number')
         stepType  = stepDescription.pop('type')
+        stepId    = stepDescription.pop('id', None)
 
         # On previent qu'on ignore les donnees inutiles
         for extraKey in stepDescription:
             self.response.write('Ignoring extra key "' + extraKey + '"\n')
 
-        entities.apiStep().add(stepName, long(stepIndex), stepType)
+        # Si argument 'id' dans la query string, alors update, sinon add
+        if stepId != None:
+            entities.apiStep().update(stepName, long(stepIndex), stepType, long(stepId))
+            self.response.write('Step "' + stepName + '" updated successfully.\n')
+        else:
+            entities.apiStep().add(stepName, long(stepIndex), stepType)
+            self.response.write('Step "' + stepName + '" added successfully.\n')
 
-        self.response.write('Step "' + stepName + '" added successfully.\n')
-
-    def add_component(self, postData):
+    def update_component(self):
 
         # Decode le JSON pour recuperer les donnees qui concernent le component a creer
         componentDescription = {}
         try:
-            componentDescription = json.loads(postData)
+            componentDescription = json.loads(self.request.body)
         except ValueError:
             self.response.write('Invalid JSON')
             return
 
         # Check si tous les champs sont presents dans les donnees POST
         requiredKeys = ['name', 'stock', 'price', 'step']
-        if not self.checkRequiredKeys(postData, requiredKeys):
+        if not self.checkRequiredKeys(componentDescription, requiredKeys):
             self.response.write('Error, missing required key in POST data. Required keys are:\n')
             for key in requiredKeys:
                 self.response.write(key + '\n')
@@ -211,96 +251,124 @@ class API(webapp2.RequestHandler):
         compStock = componentDescription.pop('stock')
         compPrice = componentDescription.pop('price')
         compStep  = componentDescription.pop('step')
+        compId    = componentDescription.pop('id', None)
 
         # On previent qu'on ignore les donnees inutiles
         for extraKey in componentDescription:
             self.response.write('Ignoring extra key "' + extraKey + '"\n')
 
-        # Recuperation de la step
-        matchingStep = entities.apiStep().search(compStep)
-        stepKey = None
-
-        if matchingStep == None:
-            self.response.write('Step not found\n')
-            return
+        # Si argument 'id' dans la query string, alors update, sinon add
+        if compId != None:
+            entities.apiComponent().update(long(compId), compName, long(compStock), long(compStep), float(compPrice))
+            self.response.write('Component successfully updated.\n')
         else:
-            # Recuperation de la key de la step
-            stepKey = matchingStep.key().id()
+            entities.apiComponent().add(compName, long(compStock), long(compStep), float(compPrice))
+            self.response.write('Component "' + compName + '" successfully added to step ' + str(compStep) + '\n')
 
-        # Ajout du component a la step
-        entities.apiComponent().add(compName, long(compStock), stepKey, float(compPrice))
+    def update_order(self):
 
-        self.response.write('Component "' + compName + '" successfully added to step "' + compStep + '"\n')
+        # Decode le JSON pour recuperer les donnees qui concernent l'order a creer
+        orderData = {}
+        try:
+            orderData = json.loads(self.request.body)
+        except ValueError:
+            self.response.write('Invalid JSON')
+            return
+
+        # Check si tous les champs necessaires sont presents dans les donnees POST
+        requiredKeys = ['components', 'dateCreation', 'dateSelling', 'user']
+        if not self.checkRequiredKeys(orderData, requiredKeys):
+            self.response.write('Error, missing required key in POST data. Required keys are:\n')
+            for key in requiredKeys:
+                self.response.write(key + '\n')
+            return
+
+        # Recuperation des donnees utiles
+        orderComponents   = orderData.pop('components')
+        orderDateCreation = orderData.pop('dateCreation')
+        orderDateSelling  = orderData.pop('dateSelling')
+        orderUser         = orderData.pop('user')
+        orderId           = orderData.pop('id', None)
+
+        # On previent qu'on ignore les donnees inutiles
+        for extraKey in componentDescription:
+            self.response.write('Ignoring extra key "' + extraKey + '"\n')
+
+        # Ajout/Update de l'order
+        # TODO: Checker si les components sont bien du bon type (id ? key ? Component ?)
+        # TODO: Checker pourquoi une seule date en parametre
+        if orderId != None:
+            entities.apiOrder().update(orderComponents, long(orderId), orderDateSelling, long(orderUser))
+            self.response.write('Order successfully updated\n')
+        else:
+            entities.apiOrder().add(orderComponents, order.dateCreation, long(orderUser))
+            self.response.write('Order successfully added\n')
 
     #
     # DELETE methods
     #
 
-    def remove_step(self, requestBody):
-
-        requestData = json.loads(requestBody)
+    def remove_step(self, queryStringArguments):
 
         # Check si le nom de la step est present
-        requiredKeys = ['step']
-        if not self.checkRequiredKeys(requestBody, requiredKeys):
-            self.response.write('Error, missing required key in request. Required keys are:\n')
+        requiredKeys = ['id']
+        if not self.checkRequiredKeys(queryStringArguments, requiredKeys):
+            self.response.write('Error, missing required argument. Required arguments are:\n')
             for key in requiredKeys:
                 self.response.write(key + '\n')
             return
 
         # Recuperation du nom de la step
-        stepName = requestData.pop('step')
+        stepId = queryStringArguments.pop('id')
 
         # On previent qu'on ignore les donnees inutiles
-        for extraKey in componentDescription:
-            self.response.write('Ignoring extra key "' + extraKey + '"\n')
+        for extraArg in queryStringArguments:
+            self.response.write('Ignoring extra argument "' + extraArg + '"\n')
 
-        # Recuperation de l'objet step
-        matchingStep = entities.apiStep().search(stepName)
-        stepKey = None
+        # Suppression de la step
+        entities.apiStep().delete(long(stepId))
 
-        if matchingStep == None:
-            self.response.write('Step not found\n')
-            return
-        else:
-            # Recuperation de la key de la step
-            stepKey = matchingStep.key().id()
+        self.response.write('Step ' + str(stepId) + ' removed successfully.')
 
-        entities.apiStep().delete(stepKey)
+    def remove_component(self, queryStringArguments):
 
-        self.response.write('Step "' + stepName + '" removed successfully.')
-
-    def remove_component(self, requestBody):
-
-        self.response.write('Request body: "' + requestBody + '"\n')
-        componentDescription = json.loads(requestBody)
-
-        # Check si le nom du component est present
-        requiredKeys = ['component']
-        if not self.checkRequiredKeys(componentDescription, requiredKeys):
-            self.response.write('Error, missing required key in request. Required keys are:\n')
+        # Check si l'id du component est present
+        requiredKeys = ['id']
+        if not self.checkRequiredKeys(queryStringArguments, requiredKeys):
+            self.response.write('Error, missing required argument. Required arguments are:\n')
             for key in requiredKeys:
                 self.response.write(key + '\n')
             return
 
-        # Recuperation du nom du component
-        compName = componentDescription.pop('component')
+        # Recuperation de l'id du component
+        compId = queryStringArguments.pop('id')
 
         # On previent qu'on ignore les donnees inutiles
-        for extraKey in componentDescription:
-            self.response.write('Ignoring extra key "' + extraKey + '"\n')
+        for extraArg in queryStringArguments:
+            self.response.write('Ignoring extra argument "' + extraArg + '"\n')
 
-        # Recuperation de l'objet component
-        matchingComp = entities.apiComponent().search(compName)
-        compKey = None
+        # Suppression du component
+        entities.apiComponent().delete(long(compId))
 
-        if matchingComp == None:
-            self.response.write('Component not found\n')
+        self.response.write('Component ' + str(compId) + ' removed successfully.\n')
+
+    def remove_order(self, queryStringArguments):
+        # Check si l'id de l'order est present
+        requiredKeys = ['id']
+        if not self.checkRequiredKeys(queryStringArguments, requiredKeys):
+            self.response.write('Error, missing required argument. Required arguments are:\n')
+            for key in requiredKeys:
+                self.response.write(key + '\n')
             return
-        else:
-            # Recuperation de la key du component
-            compKey = matchingComp.key().id()
 
-        entities.apiComponent().delete(compKey)
+        # Recuperation de l'id de l'order
+        orderId = queryStringArguments.pop('id')
 
-        self.response.write('comp "' + compName + '" removed successfully.')
+        # On previent qu'on ignore les arguments inutiles
+        for extraArg in queryStringArguments:
+            self.response.write('Ignoring extra argument "' + extraArg + '"\n')
+
+        # Suppression de l'order
+        entities.apiOrder().delete(long(orderId))
+
+        self.response.write('Order ' + str(orderId) + ' removed successfully.\n')
