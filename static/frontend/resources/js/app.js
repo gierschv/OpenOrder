@@ -35,12 +35,12 @@ $(document).ready(function() {
     }
     else {
       $('.user-logged').hide();
+      FB.Event.subscribe('auth.authResponseChange', eventLogin);
       $.mobile.changePage('#login',  { transition: "slideup" });
     }
   }
   
-  FB.Event.subscribe('auth.authResponseChange', eventLogin);
-  // FB.getLoginStatus(eventLogin);
+  FB.getLoginStatus(eventLogin);
 
   $('.FBLogin').click(function() {
     FB.login();
@@ -111,8 +111,8 @@ $(document).ready(function() {
       $('.order-previous').unbind().click(function() {
         // Go back home
         if (idx === 0) {
-          $.mobile.changePage('#splash');
-          FB.getLoginStatus(eventLogin);
+          // TDOO: clean redirect to #
+          document.location.href = '/';
         }
         else {
           newOrder.splice(idx - 1, 1);
@@ -183,7 +183,6 @@ $(document).ready(function() {
 
         $.post('/api/order.json', JSON.stringify({ api_key: profile.api_key, components: components }), function(result) {
           result = JSON.parse(result);
-          console.log(result['orderId']);
             $('.order-id').text(result['orderId']);
             $.mobile.changePage("#order-completed", { transition: "pop" });
 
