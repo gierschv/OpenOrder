@@ -28,11 +28,13 @@ $(document).ready(function() {
 			if (profile.api_key === undefined) {
 				$.get('/api/auth', response.authResponse , function (data) {
           profile = JSON.parse(data);
+          $('.user-logged').show();
           $.mobile.changePage("#homeFB", { transition: "slideup" });
         }); 
 			}
     }
     else {
+      $('.user-logged').hide();
       $.mobile.changePage('#login',  { transition: "slideup" });
     }
 	}
@@ -176,7 +178,6 @@ $(document).ready(function() {
       });
 
       $('.order-validate').unbind().click(function() {
-        console.log('Validation:', newOrder);
         var components = {};
         for (var i = 0 ; i < newOrder.length ; ++i) {
           for (var j = 0 ; j < newOrder[i].components.length ; ++j) {
@@ -185,8 +186,18 @@ $(document).ready(function() {
         }
 
         $.post('/api/order.json', JSON.stringify({ api_key: profile.api_key, components: components }), function(result) {
-          console.log(result);
+          result = JSON.parse(result);
+          console.log(result['orderId']);
+            $('.order-id').text(result['orderId']);
+            $.mobile.changePage("#order-completed", { transition: "pop" });
+
+            $('.order-favorite').click(function() {
+              // TODO
+              return false;
+            });
         });
+
+
       });
     };
 
@@ -196,7 +207,10 @@ $(document).ready(function() {
       steps = result;
       return displayStepView(0);
     });
+
+    return false;
   };
 
   $('.newOrder').click(newOrderView);
+  $('.NoFB').click(newOrderView);
 });

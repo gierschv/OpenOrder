@@ -9,19 +9,34 @@
 h1.logo {
   margin: 0 auto!important;
 }
-#order div[data-role="header"] a {
+#order div[data-role="header"] a,
+#order-completed div[data-role="header"] a {
   top: 10px;
 }
-#order fieldset div.price {
+#order fieldset div.price,
+#order-completed fieldset div.price {
   float: right;
 }
-#order div[data-role="footer"] h4 {
+#order .ui-content h4,
+#order-completed .ui-content h4 {
+  margin: 10px 0 5px 0;
+}
+#order div[data-role="footer"] h4,
+#order-completed div[data-role="footer"] h4 {
   text-align: left;
 }
-#order div[data-role="footer"] .total {
+#order div[data-role="footer"] .total,
+#order-completed div[data-role="footer"] .total {
   margin: .4em 15px .8em;
   font-size: 16px;
 }
-#order .order-summary {
+#order .order-summary,
+#order-completed .order-summary {
   margin-top: 15px;
+}
+#order .order-id,
+#order-completed .order-id {
+  text-align: center;
+  margin: 30px auto;
+  font-size: 50px;
 }

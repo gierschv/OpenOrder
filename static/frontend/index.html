@@ -21,7 +21,7 @@
 		<div data-role="content">
 			<div class="logo"><img src="/static/frontend/resources/images/logo-250.png"></div>
 			<a href="#homeFB" data-role="button" data-theme="b" class="FBLogin">Use my Facebook account</a>
-			<a href="#home" data-role="button">I don't have a Facebook account</a>
+			<a href="#order" data-role="button" class="NoFB">I don't have a Facebook account</a>
 		</div>
 	</div>
 
@@ -81,7 +81,8 @@
 			</ul>
 		</div><!-- /content -->
 	</div><!-- /page #friends_all -->
-	<!-- Start of second page: #order -->
+
+	<!-- #order -->
 	<div data-role="page" id="order">
 		<div data-role="header">
 			<a href="" data-icon="arrow-l" class="order-previous">Previous</a>
@@ -100,6 +101,26 @@
 			<h4>&nbsp;</h4>
 			<div class="total ui-btn-right">Total: &pound; <span>0.00</span></div>
 		</div> 
+	</div>
+
+	<!-- #order-completed -->
+	<div data-role="page" id="order-completed">
+		<div data-role="header">
+			<a href="" data-icon="home" class="home">Home</a>
+			<h1 class="logo"><img src="/static/frontend/resources/images/logo-100.png"></h1>
+		</div><!-- /header -->
+		<div data-role="content">
+			<p>Thank you for your order. You will be able to retrieve it soon with the number below:</p>
+			<div class="order-id">0</div>
+
+			<div class="user-logged">
+				<h4>Add this order as favourite</h4>
+				<div data-role="fieldcontain">
+				    <input type="text" name="name" id="name" placeholder="Name of the order" />
+					<a href="" data-role="button" class="order-favorite">Add as favourite</a>
+				</div>
+			</div>
+		</div>
 	</div>
 
 	<script src="/static/common/js/jquery-1.8.3.min.js"></script>
