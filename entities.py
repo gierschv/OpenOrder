@@ -63,7 +63,8 @@ class apiMain():
 
 class apiOrder():
 	def add(self, listCom, dateBuy, id):
-		O = Order(ingredient=listCom, dateCommand=dateBuy, User=User.get_by_key_name(id).key())
+		ingredientsKeys = [Component.get_by_id(componentId).key() for componentId in listCom]
+		O = Order(ingredient=ingredientsKeys, dateCommand=dateBuy, User=User.get_by_key_name(id).key())
 		O.put()
 
 	def getAll(self, pLimit):
@@ -86,9 +87,9 @@ class apiOrder():
 		O = Order.get_by_id(kidOrder)
 		O.delete()
 	
-	def update(self, ingredient, idOrder, dateSoldOut, idUser):
+	def update(self, components, idOrder, dateSoldOut, idUser):
 		O = Order.get_by_id(idOrder)
-		O.ingredient = ingredient
+		O.ingredient = [Component.get_by_id(componentId).key() for componentId in components]
 		O.Sold = dateSoldOut
 		O.User = User().get_by_id(idUser).key()
 		O.put()
