@@ -169,7 +169,7 @@ $(document).ready(function() {
       $('.order-previous').unbind().click(function() {
         newOrder.splice(newOrder.length - 1, 1);
         calculTotal();
-        return displayStepView(newOrder.length - 1);
+        return displayStepView(newOrder.length);
       });
 
       $('.order-validate').unbind().click(function() {
