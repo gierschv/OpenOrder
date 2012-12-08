@@ -125,7 +125,7 @@ class API(webapp2.RequestHandler):
             'dateCreated' : time.mktime(order.dateCommand.timetuple()),
             'dateSold'    : order.Sold,
             'components'  : componentsIds,
-            'user'        : order.User.key().name(),
+            'user'        : order.User.key().name() if order.User else None,
             'id'          : order.key().id()
         }
 
