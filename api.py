@@ -1,6 +1,8 @@
 import webapp2
 import json
 import entities
+import datetime
+import time
 
 class API(webapp2.RequestHandler):
 
@@ -118,13 +120,13 @@ class API(webapp2.RequestHandler):
     # TODO: Fix user dans orderData
     def serializableDataFromOrder(self, order):
         componentsIds = [componentKey.id() for componentKey in order.ingredient]
-        components = [entities.apiComponent().get(componentId) in componentsIds]
 
         orderData = {
-            'dateCreated' : order.dateCommand,
+            'dateCreated' : time.mktime(order.dateCommand.timetuple()),
             'dateSold'    : order.Sold,
-            'components'  : components,
-            'user'        : apiUser().get(order.User.id())
+            'components'  : componentsIds,
+            'user'        : order.User.key().name(),
+            'id'          : order.key().id()
         }
 
         return orderData
@@ -315,10 +317,10 @@ class API(webapp2.RequestHandler):
         # TODO: Checker si les components sont bien du bon type (id ? key ? Component ?)
         # TODO: Checker pourquoi une seule date en parametre
         if orderId != None:
-            entities.apiOrder().update(componentsIds, long(orderId), orderDateSelling, orderUser)
+            entities.apiOrder().update(componentsIds, long(orderId), datetime.datetime.fromtimestamp(orderDateSelling), str(orderUser))
             self.response.write('Order successfully updated\n')
         else:
-            entities.apiOrder().add(componentsIds, orderDateCreation, orderUser)
+            entities.apiOrder().add(componentsIds, datetime.datetime.fromtimestamp(orderDateCreation), str(orderUser))
             self.response.write('Order successfully added\n')
 
     #
