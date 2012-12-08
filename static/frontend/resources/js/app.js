@@ -66,7 +66,6 @@ $(document).ready(function() {
 
     // Calcul total
     var calculTotal = function() {
-      console.log(newOrder);
       total = 0;
       for (var i = 0 ; i < newOrder.length ; ++i) {
         total += newOrder[i].price;
@@ -77,8 +76,7 @@ $(document).ready(function() {
     var displayStepView = function(idx) {
       var step = steps[idx];
 
-      console.log(step);
-      order.find('.content').empty();
+      //order.find('.content').empty();
       
       // Footer
       orderFooter.find('h4').text(step.name);
@@ -116,7 +114,7 @@ $(document).ready(function() {
           FB.getLoginStatus(eventLogin);
         }
         else {
-          newOrder[idx - 1] = null;
+          newOrder.splice(idx - 1, 1);
           calculTotal();
           return displayStepView(idx - 1);
         }
@@ -139,11 +137,43 @@ $(document).ready(function() {
 
         calculTotal();
         if (idx + 1 === steps.length) {
-          
+          return displayOrder();
         }
         else {
           return displayStepView(idx + 1);
         }
+      });
+    };
+
+    // Display order summary
+    var displayOrder = function() {
+      order.find('.step-desc').hide();
+      order.find('.step-summary').show();
+
+      // Footer
+      orderFooter.find('h4').text('Order summary');
+      orderFooter.find('.total span').text(toFixed(total));
+
+      var container = order.find('.components').empty().append('<ul class="order-summary" data-role="listview"></ul>').find('ul');
+      for (var i = 0 ; i < newOrder.length ; ++i) {
+        for (var j = 0 ; j < newOrder[i].components.length ; ++j) {
+          var component = newOrder[i].components[j];
+          container.append('<li>' + steps[i].components[component.idx].name + ' <span class="ui-li-count">'+ toFixed(steps[i].components[component.idx].price) + ' &pound;</span></li>');
+        }
+      }
+
+      $.mobile.changePage('#order', { transition: "slidedown" });
+      $('#order').trigger('create');
+
+      // Actions
+      $('.order-previous').unbind().click(function() {
+        newOrder.splice(newOrder.length - 1, 1);
+        calculTotal();
+        return displayStepView(newOrder.length - 1);
+      });
+
+      $('.order-validate').unbind().click(function() {
+        console.log('Validation:', newOrder);
       });
     };
 

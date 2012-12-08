@@ -22,3 +22,6 @@ h1.logo {
   margin: .4em 15px .8em;
   font-size: 16px;
 }
+#order .order-summary {
+  margin-top: 15px;
+}
