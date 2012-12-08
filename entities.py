@@ -35,16 +35,16 @@ class favoritOrder(db.Model):
 
 class Order(db.Model):
 	ingredient = db.ListProperty(db.Key)
-	dateCommand = db.DateProperty()
-	Sold = db.DateProperty()
+	dateCommand = db.DateTimeProperty()
+	Sold = db.DateTimeProperty()
 	User = db.ReferenceProperty(User)
 
 class apiUser():
 	def get(self, id):
-		return User.get_by_id(id)
+		return User.get_by_key_name(id)
 
 	def delete(self, idUser):
-		User.get_by_id(idUser).delete()
+		User.get_by_key_name(idUser).delete()
 
 	def getApiKey(self, ApiKey):
 		q = User.all()
@@ -63,7 +63,8 @@ class apiMain():
 
 class apiOrder():
 	def add(self, listCom, dateBuy, id):
-		O = Order(ingredient=listCom, dateCommand=dateBuy, User=User.get_by_id(id).key())
+		ingredientsKeys = [Component.get_by_id(componentId).key() for componentId in listCom]
+		O = Order(ingredient=ingredientsKeys, dateCommand=dateBuy, User=User.get_by_key_name(id).key())
 		O.put()
 
 	def getAll(self, pLimit):
@@ -79,19 +80,16 @@ class apiOrder():
 
 	def getUserOrder(self, id, pLimit):
 		q = Order.all()
-		return q.filter('User =', User.get_by_id(id).key()).order('-dateCommand').fetch(limit = pLimit)
+		return q.filter('User =', User.get_by_key_name(id).key()).order('-dateCommand').fetch(limit = pLimit)
 
-	def getUserfavOrder(self, id, pLimit):
-		q = favoritOrder.all()
-		return q.filter('User =', User.get_by_id(id).key()).order('-nbVote').fetch(limit = pLimit)
 
 	def delete(self, idOrder):
-		O = Order.get_by_id(idOrder)
+		O = Order.get_by_id(kidOrder)
 		O.delete()
 	
-	def update(self, ingredient, idOrder, dateSoldOut, idUser):
+	def update(self, components, idOrder, dateSoldOut, idUser):
 		O = Order.get_by_id(idOrder)
-		O.ingredient = ingredient
+		O.ingredient = [Component.get_by_id(componentId).key() for componentId in components]
 		O.Sold = dateSoldOut
 		O.User = User().get_by_id(idUser).key()
 		O.put()
@@ -106,7 +104,7 @@ class apiOrder():
 
 class apifavoriteOrder():
 	def add(self, listCom, nbVote, idUser, pname):
-		O = FavOrder(ingredient=listCom, nbVote=nbVote, User=User.get_by_id(idUser).key(), name=pname)
+		O = FavOrder(ingredient=listCom, nbVote=nbVote, User=User.get_by_key_name(idUser).key(), name=pname)
 		O.put()
 
 	def search():
@@ -120,9 +118,13 @@ class apifavoriteOrder():
 		O = FavOrder.get_by_id(idFav)
 		O.ingredient = ingredient
 		O.name = pName
-		O.User = User.get_by_id(idUser).key()
+		O.User = User.get_by_key_name(idUser).key()
 		O.nbVote = pNbVote
 		O.put()
+	
+	def getUserfavOrder(self, id, pLimit):
+		q = favoritOrder.all()
+		return q.filter('User =', User.get_by_key_name(id).key()).order('-nbVote').fetch(limit = pLimit)
 
 	def get(self, id):
 		return favoritOrder.get_by_id(id)
@@ -139,13 +141,11 @@ class apiStep():
 
 	def delete(self, idStep):
 		c = Component.all()
-		step = Step.get_by_id(idStep)
-
-		if step != None:
-			c.filter('Step =', step.key())
-			for component in c.run():
-				component.delete()
-			step.delete()
+		c.filter('Step =', Step.get_by_id(idStep).key())
+		for toto in c.run():
+			toto.delete()
+		q = Step.get_by_id(idStep)
+		q.delete()
 
 	def search(self, pName):
 		if pName is None:
@@ -178,8 +178,7 @@ class apiComponent():
 
 	def delete(self, idCom):
 		q = Component.get_by_id(idCom)
-		if q != None:
-			q.delete()
+		q.delete()
 
 	def update(self, idCom, Name, Stock, idStep, pPrix):
 		com = Component.get_by_id(idCom)

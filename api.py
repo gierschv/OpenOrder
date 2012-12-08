@@ -1,6 +1,8 @@
 import webapp2
 import json
 import entities
+import datetime
+import time
 
 class API(webapp2.RequestHandler):
 
@@ -118,13 +120,13 @@ class API(webapp2.RequestHandler):
     # TODO: Fix user dans orderData
     def serializableDataFromOrder(self, order):
         componentsIds = [componentKey.id() for componentKey in order.ingredient]
-        components = [entities.apiComponent().get(componentId) in componentsIds]
 
         orderData = {
-            'dateCreated' : order.dateCommand,
+            'dateCreated' : time.mktime(order.dateCommand.timetuple()),
             'dateSold'    : order.Sold,
-            'components'  : components,
-            'user'        : 0
+            'components'  : componentsIds,
+            'user'        : order.User.key().name(),
+            'id'          : order.key().id()
         }
 
         return orderData
@@ -132,12 +134,6 @@ class API(webapp2.RequestHandler):
     #
     # GET methods
     #
-
-    # def add(self, argumentMap, requestBody):
-    # 	self.response.write('Called function add, arguments:\n')
-    #     entities.apiStep().add("starters", 1, "multi")
-    #     entities.apiComponent().add("chips", 152, entities.apiStep().search('starters').key().id(), 5.25)
-    # 	self.response.write(argumentMap)
 
     def get_steps(self, argumentMap):
         steps = entities.apiStep().search(None)
@@ -174,19 +170,6 @@ class API(webapp2.RequestHandler):
             ordersData.append(self.serializableDataFromOrder(order))
 
         json.dump(ordersData, self.response)
-
-    # def get_components_from_step_index(self, argumentMap):
-    #     requiredParams = ['step_index']
-    #     if not self.checkRequiredKeys(argumentMap, requiredParams):
-    #         self.response.write('Error, missing required key in POST data. Required keys are:\n')
-    #         for key in requiredKeys:
-    #             self.response.write(key + '\n')
-    #         return
-
-    # def update(self, argumentMap, requestBody):
-    #     self.response.write('Called functions update, arguments:\n')
-    #     obj = entities.apiComponent().search("chips")
-    #     entities.apiComponent().update(obj.key().id(), obj.name, obj.stock - 1, obj.Step.key().id(), 12.0)
 
     #
     # POST methods
@@ -276,7 +259,7 @@ class API(webapp2.RequestHandler):
             return
 
         # Check si tous les champs necessaires sont presents dans les donnees POST
-        requiredKeys = ['components', 'dateCreation', 'dateSelling', 'user']
+        requiredKeys = ['components', 'user']
         if not self.checkRequiredKeys(orderData, requiredKeys):
             self.response.write('Error, missing required key in POST data. Required keys are:\n')
             for key in requiredKeys:
@@ -285,23 +268,59 @@ class API(webapp2.RequestHandler):
 
         # Recuperation des donnees utiles
         orderComponents   = orderData.pop('components')
-        orderDateCreation = orderData.pop('dateCreation')
-        orderDateSelling  = orderData.pop('dateSelling')
+        orderDateCreation = orderData.pop('dateCreation', None)
+        orderDateSelling  = orderData.pop('dateSelling', None)
         orderUser         = orderData.pop('user')
         orderId           = orderData.pop('id', None)
 
+        if orderId == None and orderDateCreation == None:
+            self.response.write('Error: Missing date of creation of the order.\n')
+            return
+
         # On previent qu'on ignore les donnees inutiles
-        for extraKey in componentDescription:
+        for extraKey in orderData:
             self.response.write('Ignoring extra key "' + extraKey + '"\n')
+
+        # On construit la liste des ids des components
+        componentsIds = []
+        steps = {}
+        for compId in orderComponents:
+
+            compQuantity = orderComponents[compId]
+
+            # Recuperation du component
+            component = entities.apiComponent().get(long(compId))
+            if component == None:
+                self.response.write('Error: Invalid component id "' + str(compId) + '".\n')
+                return
+
+            # Recuperation de la step du component si pas deja fait
+            if component.Step.key().id() not in steps:
+                step = entities.apiStep().get(component.Step.key().id())
+                if step == None:
+                    self.response.write('Error: Failed to retrieve step for component with id "' + str(compId) + '".\n')
+                    return
+                steps[component.Step.key().id()] = step
+            else:
+                step = steps[component.Step.key().id()]
+
+                # Verification qu'il n'y ait pas plusieurs components pour une step de type "one"
+                if step.type == "one":
+                    self.response.write('Error: Multiple components specified for step "' + step.name + '" (id ' + str(step.id()) + ').\n')
+                    return
+
+            for i in range(compQuantity):
+                componentsIds.append(long(compId))
+
 
         # Ajout/Update de l'order
         # TODO: Checker si les components sont bien du bon type (id ? key ? Component ?)
         # TODO: Checker pourquoi une seule date en parametre
         if orderId != None:
-            entities.apiOrder().update(orderComponents, long(orderId), orderDateSelling, long(orderUser))
+            entities.apiOrder().update(componentsIds, long(orderId), datetime.datetime.fromtimestamp(orderDateSelling), str(orderUser))
             self.response.write('Order successfully updated\n')
         else:
-            entities.apiOrder().add(orderComponents, order.dateCreation, long(orderUser))
+            entities.apiOrder().add(componentsIds, datetime.datetime.fromtimestamp(orderDateCreation), str(orderUser))
             self.response.write('Order successfully added\n')
 
     #
