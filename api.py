@@ -259,7 +259,7 @@ class API(webapp2.RequestHandler):
             return
 
         # Check si tous les champs necessaires sont presents dans les donnees POST
-        requiredKeys = ['components', 'user']
+        requiredKeys = ['components']
         if not self.checkRequiredKeys(orderData, requiredKeys):
             self.response.write('Error, missing required key in POST data. Required keys are:\n')
             for key in requiredKeys:
@@ -268,25 +268,22 @@ class API(webapp2.RequestHandler):
 
         # Recuperation des donnees utiles
         orderComponents   = orderData.pop('components')
-        orderDateCreation = orderData.pop('dateCreation', None)
+        orderDateCreation = orderData.pop('dateCreation', time.time())
         orderDateSelling  = orderData.pop('dateSelling', None)
-        orderUser         = orderData.pop('user')
         orderId           = orderData.pop('id', None)
 
-        if orderId == None and orderDateCreation == None:
-            self.response.write('Error: Missing date of creation of the order.\n')
-            return
-
-        # On previent qu'on ignore les donnees inutiles
-        for extraKey in orderData:
-            self.response.write('Ignoring extra key "' + extraKey + '"\n')
+        # Check API key
+        if orderData['api_key'] != None:
+            user = entities.apiUser().getApiKey(orderData['api_key'])
+            if not user:
+                return self.abort(403)
+            orderUser = user.key().name()
 
         # On construit la liste des ids des components
         componentsIds = []
         steps = {}
         for compId in orderComponents:
-
-            compQuantity = orderComponents[compId]
+            compQuantity = orderComponents[str(compId)]
 
             # Recuperation du component
             component = entities.apiComponent().get(long(compId))
@@ -317,11 +314,11 @@ class API(webapp2.RequestHandler):
         # TODO: Checker si les components sont bien du bon type (id ? key ? Component ?)
         # TODO: Checker pourquoi une seule date en parametre
         if orderId != None:
-            entities.apiOrder().update(componentsIds, long(orderId), datetime.datetime.fromtimestamp(orderDateSelling), str(orderUser))
-            self.response.write('Order successfully updated\n')
+            order = entities.apiOrder().update(componentsIds, long(orderId), datetime.datetime.fromtimestamp(orderDateSelling), str(orderUser))
+            self.response.write(json.dumps({ 'orderId': order.key().id() }))
         else:
-            entities.apiOrder().add(componentsIds, datetime.datetime.fromtimestamp(orderDateCreation), str(orderUser))
-            self.response.write('Order successfully added\n')
+            order = entities.apiOrder().add(componentsIds, datetime.datetime.fromtimestamp(orderDateCreation), str(orderUser))
+            self.response.write(json.dumps({ 'orderId': order.key().id() }))
 
     #
     # DELETE methods
