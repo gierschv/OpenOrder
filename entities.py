@@ -35,8 +35,8 @@ class favoritOrder(db.Model):
 
 class Order(db.Model):
 	ingredient = db.ListProperty(db.Key)
-	dateCommand = db.DateProperty()
-	Sold = db.DateProperty()
+	dateCommand = db.DateTimeProperty()
+	Sold = db.DateTimeProperty()
 	User = db.ReferenceProperty(User)
 
 class apiUser():
