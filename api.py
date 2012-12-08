@@ -117,7 +117,6 @@ class API(webapp2.RequestHandler):
         }
         return stepData
 
-    # TODO: Fix user dans orderData
     def serializableDataFromOrder(self, order):
         componentsIds = [componentKey.id() for componentKey in order.ingredient]
 
@@ -163,13 +162,20 @@ class API(webapp2.RequestHandler):
         json.dump(componentsData, self.response)
 
     def get_orders(self, argumentMap):
-        orders = entities.apiOrder().getAll(None)
 
-        ordersData = []
-        for order in orders:
-            ordersData.append(self.serializableDataFromOrder(order))
+        # All orders of just a specific one
+        if 'id' in argumentMap:
+            order = entities.apiOrder().get(long(argumentMap['id']))
+            if order:
+                json.dump(self.serializableDataFromOrder(order))
+        else:
+            orders = entities.apiOrder().getAll(None)
 
-        json.dump(ordersData, self.response)
+            ordersData = []
+            for order in orders:
+                ordersData.append(self.serializableDataFromOrder(order))
+
+            json.dump(ordersData, self.response)
 
     #
     # POST methods
