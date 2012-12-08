@@ -89,7 +89,7 @@ $(document).ready(function() {
         order.find('.step-one').show();
         // Componenents
         for (var i = 0 ; i < step.components.length ; ++i) {
-          container.append('<input type="radio" name="components" value="' + step.components[i].id + '" idx="' + i + '" id="component-' + step.components[i].id + '" /><label for="component-' + step.components[i].id + '">' + step.components[i].name + ' <div class="price">' + toFixed(step.components[i].price) + ' &pound;</div></label>');
+          container.append('<input type="radio" name="components" value="' + step.components[i].id + '" idx="' + i + '" id="component-' + step.components[i].id + '" /><label for="component-' + step.components[i].id + '">' + step.components[i].name + ' <div class="price">&pound; ' + toFixed(step.components[i].price) + '</div></label>');
           if (i === 0) {
             container.find('input').attr('checked', true);
           }
@@ -98,7 +98,7 @@ $(document).ready(function() {
       else {
         order.find('.step-multiple').show();
         for (var i = 0 ; i < step.components.length ; ++i) {
-          container.append('<input type="checkbox" name="components" value="' + step.components[i].id + '" idx="' + i + '" id="component-' + step.components[i].id + '" /><label for="component-' + step.components[i].id + '">' + step.components[i].name + ' <div class="price">' + toFixed(step.components[i].price) + ' &pound;</div></label>');
+          container.append('<input type="checkbox" name="components" value="' + step.components[i].id + '" idx="' + i + '" id="component-' + step.components[i].id + '" /><label for="component-' + step.components[i].id + '">' + step.components[i].name + ' <div class="price">&pound; ' + toFixed(step.components[i].price) + '</div></label>');
         }
       }
 
@@ -158,7 +158,7 @@ $(document).ready(function() {
       for (var i = 0 ; i < newOrder.length ; ++i) {
         for (var j = 0 ; j < newOrder[i].components.length ; ++j) {
           var component = newOrder[i].components[j];
-          container.append('<li>' + steps[i].components[component.idx].name + ' <span class="ui-li-count">'+ toFixed(steps[i].components[component.idx].price) + ' &pound;</span></li>');
+          container.append('<li>' + steps[i].components[component.idx].name + ' <span class="ui-li-count">&pound; '+ toFixed(steps[i].components[component.idx].price) + '</span></li>');
         }
       }
 
