@@ -64,7 +64,9 @@ class apiMain():
 class apiOrder():
 	def add(self, listCom, dateBuy, id):
 		ingredientsKeys = [Component.get_by_id(componentId).key() for componentId in listCom]
-		O = Order(ingredient=ingredientsKeys, dateCommand=dateBuy, User=User.get_by_key_name(id).key())
+		O = Order(ingredient=ingredientsKeys, dateCommand=dateBuy)
+		if id == None:
+			O.User = User.get_by_key_name(id).key()
 		O.put()
 		return O
 

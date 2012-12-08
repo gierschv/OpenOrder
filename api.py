@@ -273,11 +273,13 @@ class API(webapp2.RequestHandler):
         orderId           = orderData.pop('id', None)
 
         # Check API key
-        if orderData['api_key'] != None:
+        if orderData.has_key('api_key'):
             user = entities.apiUser().getApiKey(orderData['api_key'])
             if not user:
                 return self.abort(403)
             orderUser = user.key().name()
+        else:
+            orderUser = None
 
         # On construit la liste des ids des components
         componentsIds = []
