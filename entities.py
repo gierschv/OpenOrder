@@ -86,7 +86,7 @@ class apiOrder():
 		return q.filter('User =', User.get_by_id(id).key()).order('-nbVote').fetch(limit = pLimit)
 
 	def delete(self, idOrder):
-		O = Order.get_by_id(kidOrder)
+		O = Order.get_by_id(idOrder)
 		O.delete()
 	
 	def update(self, ingredient, idOrder, dateSoldOut, idUser):
