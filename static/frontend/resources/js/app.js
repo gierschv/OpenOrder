@@ -10,15 +10,14 @@ $(document).ready(function() {
  
   var accessToken, profile = {};
   var eventLogin = function(response) {
-    console.log(response);
     if (response.status === 'connected') {
-      if (profile === undefined) {
+      if (profile.api_key === undefined) {
+        console.log('pass');
         $.get('/api/auth', response.authResponse , function (data) {
-          profile = data;
+          profile = JSON.parse(data);
+          $.mobile.changePage("#homeFB", { transition: "slideup" });
         }); 
       }
-
-      $.mobile.changePage("#homeFB", { transition: "slideup" });
     }
     else {
       $.mobile.changePage('#login',  { transition: "slideup" });
@@ -39,7 +38,7 @@ $(document).ready(function() {
 
   // Facebook events
   FB.Event.subscribe('auth.authResponseChange', eventLogin);
-  FB.getLoginStatus(eventLogin);
+  //FB.getLoginStatus(eventLogin);
 
   $('.FBLogin').click(function() {
     FB.login();
@@ -174,6 +173,16 @@ $(document).ready(function() {
 
       $('.order-validate').unbind().click(function() {
         console.log('Validation:', newOrder);
+        var components = {};
+        for (var i = 0 ; i < newOrder.length ; ++i) {
+          for (var j = 0 ; j < newOrder[i].components.length ; ++j) {
+            components[newOrder[i].components[j].id] = 1;
+          }
+        }
+
+        $.post('/api/order.json', JSON.stringify({ api_key: profile.api_key, components: components }), function(result) {
+          console.log(result);
+        });
       });
     };
 
