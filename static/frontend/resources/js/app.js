@@ -62,7 +62,16 @@ $(document).ready(function() {
   // Create the new order view
   var newOrderView = function() {
     var order = $('#order'), orderFooter = order.find('div[data-role="footer"]'),
-      steps = [], total = 0;
+      steps = [], newOrder = [], total = 0;
+
+    // Calcul total
+    var calculTotal = function() {
+      console.log(newOrder);
+      total = 0;
+      for (var i = 0 ; i < newOrder.length ; ++i) {
+        total += newOrder[i].price;
+      }
+    };
 
     // Display a step
     var displayStepView = function(idx) {
@@ -77,13 +86,12 @@ $(document).ready(function() {
 
       // Step description and content
       order.find('.step-desc').hide();
+      var container = order.find('.components').empty().append('<fieldset data-role="controlgroup"></fieldset>').find('fieldset');
       if (step.type === 'one') {
         order.find('.step-one').show();
-
         // Componenents
-        var container = order.find('.components').empty().append('<fieldset data-role="controlgroup"></fieldset>').find('fieldset');
         for (var i = 0 ; i < step.components.length ; ++i) {
-          container.append('<input type="radio" name="components" value="' + step.components[i].id + '" id="component-' + step.components[i].id + '" /><label for="component-' + step.components[i].id + '">' + step.components[i].name + ' <div class="price">' + toFixed(step.components[i].price) + ' &pound;</div></label>');
+          container.append('<input type="radio" name="components" value="' + step.components[i].id + '" idx="' + i + '" id="component-' + step.components[i].id + '" /><label for="component-' + step.components[i].id + '">' + step.components[i].name + ' <div class="price">' + toFixed(step.components[i].price) + ' &pound;</div></label>');
           if (i === 0) {
             container.find('input').attr('checked', true);
           }
@@ -91,6 +99,9 @@ $(document).ready(function() {
       }
       else {
         order.find('.step-multiple').show();
+        for (var i = 0 ; i < step.components.length ; ++i) {
+          container.append('<input type="checkbox" name="components" value="' + step.components[i].id + '" idx="' + i + '" id="component-' + step.components[i].id + '" /><label for="component-' + step.components[i].id + '">' + step.components[i].name + ' <div class="price">' + toFixed(step.components[i].price) + ' &pound;</div></label>');
+        }
       }
 
       // Display view
@@ -98,11 +109,40 @@ $(document).ready(function() {
       $('#order').trigger('create');
 
       // Actions
-      $('.order-previous').click(function() {
+      $('.order-previous').unbind().click(function() {
         // Go back home
         if (idx === 0) {
           $.mobile.changePage('#splash');
           FB.getLoginStatus(eventLogin);
+        }
+        else {
+          newOrder[idx - 1] = null;
+          calculTotal();
+          return displayStepView(idx - 1);
+        }
+      });
+
+      $('.order-validate').unbind().click(function() {
+        newOrder[idx] = { components: [], price: 0 };
+
+        if (step.type === 'one') {
+          var input = order.find('input[type="radio"]:checked');
+          newOrder[idx].components.push({ id: input.val() , idx: input.attr('idx') });
+          newOrder[idx].price = steps[idx].components[input.attr('idx')].price;
+        }
+        else {
+          $('input[type="checkbox"]:checked').each(function() {
+            newOrder[idx].components.push({ id: $(this).val() , idx: $(this).attr('idx') });
+            newOrder[idx].price += steps[idx].components[$(this).attr('idx')].price;
+          });
+        }
+
+        calculTotal();
+        if (idx + 1 === steps.length) {
+          
+        }
+        else {
+          return displayStepView(idx + 1);
         }
       });
     };
