@@ -9,3 +9,16 @@
 h1.logo {
   margin: 0 auto!important;
 }
+#order div[data-role="header"] a {
+  top: 10px;
+}
+#order fieldset div.price {
+  float: right;
+}
+#order div[data-role="footer"] h4 {
+  text-align: left;
+}
+#order div[data-role="footer"] .total {
+  margin: .4em 15px .8em;
+  font-size: 16px;
+}
