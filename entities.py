@@ -119,8 +119,13 @@ class apifavoriteOrder():
 		O = favoritOrder(ingredient=listCom, nbVote=nbVote, User=User.get_by_key_name(idUser).key(), name=pname)
 		O.put()
 
-	def search():
-		pass
+	def getTopFav(self, pLimit):
+		q = favoritOrder.all().order('-nbVote')
+		nb = q.count()
+		if pLimit == None:
+			return q.fetch(limit=nb)
+		else:
+			return q.fectch(limit = pLimit)
 
 	def delete(self, id):
 		O = favoritOrder.get_by_id(id)
@@ -135,8 +140,12 @@ class apifavoriteOrder():
 		O.put()
 	
 	def getUserfavOrder(self, id, pLimit):
-		q = favoritOrder.all()
-		return q.filter('User =', User.get_by_key_name(id).key()).order('-nbVote').fetch(limit = pLimit)
+		if pLimit == None:
+			q = favoritOrder.all().filter('User =', User.get_by_key_name(id).key())
+			nb = q.count()
+			return q.order('-nbVote').fetch(limit = nb)
+		else:	
+			return q.order('-nbVote').fetch(limit = pLimit)
 
 	def get(self, id):
 		return favoritOrder.get_by_id(id)
