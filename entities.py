@@ -12,8 +12,8 @@ class User(db.Model):
 	access_token = db.StringProperty()
 	first_name = db.StringProperty()
 	last_name = db.StringProperty()
-	active = db.BooleanProperty()
-	admin = db.BooleanProperty()
+	active = db.BooleanProperty(default=True)
+	admin = db.BooleanProperty(default=False)
 
 class Step(db.Model):
 	name = db.StringProperty()
@@ -49,6 +49,21 @@ class apiUser():
 	def getApiKey(self, ApiKey):
 		q = User.all()
 		return q.filter('api_key =', ApiKey).get()
+
+	def Update(self, firstname, lastname, pActive, pAdmin, id):
+		q = User.get_by_key_name(id)
+		if q == None:
+			return None
+		if firstname != None:
+			q.first_name = firstname
+		if lastname != None:
+			q.last_name = lastname
+		if active != None:
+			q.active = pActive
+		if admin != None:
+			q.admin = pAdmin
+		q.put()
+		return q
 
 #
 #	Class to get back any kind of entities. request is based on the key, useful with foreign key
