@@ -47,6 +47,16 @@ $(document).ready(function() {
     return false;
   });
 
+  $('.home').click(function() {
+    if (profile.api_key === undefined) {
+      $.mobile.changePage('#login',  { transition: "slideup" });
+    }
+    else {
+      $.mobile.changePage('#homeFB',  { transition: "slideup" });
+    }
+    return false;
+  });
+
   // Helpers
   var toFixed = function(value, precision) {
       var precision = precision || 2,
