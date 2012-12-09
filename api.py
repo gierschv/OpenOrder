@@ -7,8 +7,12 @@ import time
 class API(webapp2.RequestHandler):
 
     #
-    # Request handling, GET/POST/DELETE
+    # Request handling, OPTIONS/GET/POST/DELETE
     #
+
+    def options(self):
+        self.response.headers['Access-Control-Allow-Origin'] = '*'
+        self.response.headers['Access-Control-Allow-Methods'] = 'OPTIONS, HEAD, GET, POST, DELETE'
 
     def get(self):
     	mapping = {
