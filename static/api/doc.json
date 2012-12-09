@@ -1,10 +1,22 @@
 {
     "apiVersion": "0.1",
     "swaggerVersion": "1.1",
-    "basePath": "http://open-order.appspot.com/api",
+    "basePath": "http://localhost:8081/api",
     "apis": [
         {
+            "path": "/doc/auth.{format}",
+            "description": ""
+        },
+        {
             "path": "/doc/step.{format}",
+            "description": ""
+        },
+        {
+            "path": "/doc/component.{format}",
+            "description": ""
+        },
+        {
+            "path": "/doc/order.{format}",
             "description": ""
         }
     ]

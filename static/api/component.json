@@ -2,31 +2,31 @@
     "apiVersion": "0.1",
     "swaggerVersion": "1.1",
     "basePath": "http://localhost:8081/api",
-    "resourcePath": "/step",
+    "resourcePath": "/component",
     "apis": [
         {
-            "path": "/step.{format}",
-            "description": "Manage steps",
+            "path": "/component.{format}",
+            "description": "Manage components",
             "operations": [
                 {
                     "httpMethod": "GET",
-                    "summary": "Fetch all the steps and associed components",
-                    "responseClass": "Step",
-                    "nickname": "getStep"
+                    "summary": "Fetch all the components",
+                    "responseClass": "Component",
+                    "nickname": "getComponents"
                 },
                 {
                     "httpMethod": "POST",
-                    "summary": "Create or update a step",
+                    "summary": "Create or update a component",
                     "notes": "This can only be done by an administrator user.",
                     "responseClass": "void",
-                    "nickname": "createStep",
+                    "nickname": "createComponent",
                     "parameters": [
                         {
-                            "description": "Created step",
+                            "description": "Created a component",
                             "paramType": "body",
                             "required": true,
                             "allowMultiple": false,
-                            "dataType": "Step"
+                            "dataType": "Component"
                         }
                     ],
                     "errorResponses": [
@@ -42,10 +42,10 @@
                 },
                 {
                     "httpMethod": "DELETE",
-                    "summary": "Delete a step",
+                    "summary": "Delete a component",
                     "notes": "This can only be done by an administrator user.",
                     "responseClass": "void",
-                    "nickname": "deleteStep",
+                    "nickname": "deleteComponent",
                     "parameters": [
                         {
                             "name": "id",
@@ -71,26 +71,19 @@
         }
     ],
     "models": {
-        "Step": {
-            "id": "Step",
+        "Component": {
+            "id": "Component",
             "properties": {
                 "name": {
                     "type": "string"
                 },
-                "number": {
+                "stock": {
                     "type": "int"
                 },
-                "type": {
-                    "allowableValues": {
-                        "valueType": "LIST",
-                        "values": [
-                            "one",
-                            "multi"
-                        ]
-                    },
-                    "type": "string"
+                "price": {
+                    "type": "float"
                 },
-                "id": {
+                "step": {
                     "type": "int"
                 }
             }
