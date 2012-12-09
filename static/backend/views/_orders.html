@@ -65,7 +65,7 @@
         </div>
         <div class="modal-footer">
             <button class="btn" data-dismiss="modal">Close</button>
-            <button type="submit" class="btn btn-success" ng-click="markSelled(detailedOrder.id)"><i class="icon icon-white icon-ok"></i> Mark as selled</button>
+            <button type="submit" class="btn btn-success" ng-hide="detailedOrder.dateSold" ng-click="markSelled(detailedOrder.id)"><i class="icon icon-white icon-ok"></i> Mark as selled</button>
         </div>
     </div>
 </div>
