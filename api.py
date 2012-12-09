@@ -43,14 +43,16 @@ class API(webapp2.RequestHandler):
         self.response.headers['Content-Type'] = 'text/plain'
 
         mapping = {
-            'step'            : self.update_step,
-            'step.json'       : self.update_step,
-            'component'       : self.update_component,
-            'component.json'  : self.update_component,
-            'order'           : self.update_order,
-            'order.json'      : self.update_order,
-            'order/sell'      : self.sell_order,
-            'order.json/sell' : self.sell_order
+            'step'                : self.update_step,
+            'step.json'           : self.update_step,
+            'component'           : self.update_component,
+            'component.json'      : self.update_component,
+            'order'               : self.update_order,
+            'order.json'          : self.update_order,
+            'order/sell'          : self.sell_order,
+            'order.json/sell'     : self.sell_order,
+            'order/favorite'      : self.add_order_to_favorites,
+            'order.json/favorite' : self.add_order_to_favorites
         }
 
         # Recuperation de la methode appelee
@@ -369,6 +371,38 @@ class API(webapp2.RequestHandler):
         entities.apiOrder().setSold(orderId, dateSold)
 
         self.response.write(json.dumps({ 'success': True }))
+
+    def add_order_to_favorites(self):
+        # Decode JSON
+        data = {}
+        try:
+            data = json.loads(self.request.body)
+        except ValueError:
+            self.response.write('Invalid JSON')
+            return
+
+        # Get order id
+        if 'id' not in data:
+            self.response.write('Error: Missing order id.\n')
+            return
+
+        orderId = long(data['id'])
+
+        # Get the order itself
+        order = entities.apiOrder().get(orderId)
+        if order == None:
+            self.response.write('Error: No order matching with order id "' + str(orderId) + '".\n')
+            return
+
+        # Get the name given to the favorite
+        if 'name' not in data:
+            self.response.write('Error: Missing favorite name.\n')
+            return
+        orderName = data['name']
+
+        entities.apifavoriteOrder().add(order.ingredient, 0, order.User.key().name(), orderName)
+
+        json.dump({'success': True}, self.response)
 
     #
     # DELETE methods
