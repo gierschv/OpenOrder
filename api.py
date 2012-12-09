@@ -308,7 +308,7 @@ class API(webapp2.RequestHandler):
             return
 
         # Check API key
-        if not self.checkApiKeyIsAdmin(stepDescription.get('api_key')):
+        if not self.checkApiKeyIsAdmin(componentDescription.get('api_key')):
             return self.abort(403)
 
         # Check si tous les champs sont presents dans les donnees POST
@@ -395,6 +395,10 @@ class API(webapp2.RequestHandler):
                 if step.type == "one":
                     self.response.write('Error: Multiple components specified for step "' + step.name + '" (id ' + str(step.id()) + ').\n')
                     return
+
+            # Decrease component stock
+            component.stock -= compQuantity
+            component.put()
 
             for i in range(compQuantity):
                 componentsIds.append(long(compId))
