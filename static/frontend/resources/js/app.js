@@ -47,7 +47,7 @@ $(document).ready(function() {
     return false;
   });
 
-  // Format prices
+  // Helpers
   var toFixed = function(value, precision) {
       var precision = precision || 2,
       neg = value < 0,
@@ -60,10 +60,43 @@ $(document).ready(function() {
       return precision ? integral + '.' +  padding + fraction : integral;
   };
 
+  var pad2 = function(number) {
+    return (number < 10 ? '0' : '') + number;
+  };
+
+  var getComponentById = function(components, id) {
+    for (var i = 0 ; i < components.length ; ++i) {
+      if (components[i].id === id) {
+        return components[i];
+      }
+    }
+
+    return null;
+  };
+
+  var getComponentIdxById = function(components, id) {
+    for (var i = 0 ; i < components.length ; ++i) {
+      if (components[i].id === id) {
+        return i;
+      }
+    }
+
+    return null;
+  };
+
+  // Helper to calcul order price
+  var orderPrice = function(order, components) {
+    var price = 0;
+    for (var i = 0 ; i < order.components.length ; ++i) {
+      price += getComponentById(components, order.components[i]).price;
+    }
+    return price;
+  };
+
   // Create the new order view
-  var newOrderView = function() {
+  var newOrderView = function(importOrderComponents, importComponents, importPreviousPage) {
     var order = $('#order'), orderFooter = order.find('div[data-role="footer"]'),
-      steps = [], newOrder = [], total = 0;
+        steps = [], newOrder = [], total = 0;
 
     // Calcul total
     var calculTotal = function() {
@@ -168,9 +201,16 @@ $(document).ready(function() {
 
       // Actions
       $('.order-previous').unbind().click(function() {
-        newOrder.splice(newOrder.length - 1, 1);
-        calculTotal();
-        return displayStepView(newOrder.length);
+        // New order
+        if (importPreviousPage === undefined) {
+          newOrder.splice(newOrder.length - 1, 1);
+          calculTotal();
+          return displayStepView(newOrder.length);
+        }
+        // From history, favourite, etc.
+        else {
+          return importPreviousPage();
+        }
       });
 
       $('.order-validate').unbind().click(function() {
@@ -202,40 +242,37 @@ $(document).ready(function() {
 
     // Init
     $.mobile.loading('show');
-    $.get('/api/step.json', { api_key: profile.api_key }, function(result) {
-      steps = result;
-      return displayStepView(0);
-    });
+    if (importComponents === undefined) {
+      $.get('/api/step.json', { api_key: profile.api_key }, function(result) {
+        steps = result;
+        return displayStepView(0);
+      });
+    }
+    // From history, favourite, etc.
+    else {
+      // Virtual-step with all components
+      steps = [{ index:1, type: 'multi', components: importComponents }];
+      
+      // Calcul virtual-order
+      var components = [], price = 0;
+      for (var i = 0 ; i < importOrderComponents.length ; ++i) {
+        var cId = getComponentIdxById(importComponents, importOrderComponents[i]);
+        components.push({ idx: cId, id: importComponents[cId].id });
+        price += importComponents[cId].price;
+      }
+      newOrder = [{ price: price, components: components }];
+
+      // Total + display
+      calculTotal();
+      displayOrder();
+      $.mobile.changePage('#order', { transition: "slidedown" });
+    }
 
     return false;
   };
 
   $('.newOrder').click(newOrderView);
   $('.NoFB').click(newOrderView);
-
-  // Helpers
-  var pad2 = function(number) {
-    return (number < 10 ? '0' : '') + number;
-  };
-
-  var getComponentById = function(components, id) {
-    for (var i = 0 ; i < components.length ; ++i) {
-      if (components[i].id === id) {
-        return components[i];
-      }
-    }
-
-    return null;
-  };
-
-  // Helper to calcul order price
-  var orderPrice = function(order, components) {
-    var price = 0;
-    for (var i = 0 ; i < order.components.length ; ++i) {
-      price += getComponentById(components, order.components[i]).price;
-    }
-    return price;
-  };
 
   // History Orders
   var historyOrdersView = function() {
@@ -246,9 +283,14 @@ $(document).ready(function() {
       var container = order.find('.order-history').empty();
       for (var i = orders.length - 1; i >= 0 ; i--) {
         var date = new Date(orders[i].dateCreated * 1000);
-        container.append('<li><a>' + pad2(date.getDay()) + '/' + pad2(date.getMonth() + 1) + '/' + date.getFullYear() +
+        container.append('<li><a href="" class="history-reorder" order-idx="' + i + '">' + pad2(date.getDay()) + '/' + pad2(date.getMonth() + 1) + '/' + date.getFullYear() +
                          ' <span class="ui-li-count">&pound; '+ toFixed(orderPrice(orders[i], components)) + '</span></a></li>');
       }
+
+      // Re-order an history command
+      $('.history-reorder').unbind().click(function() {
+        return newOrderView(orders[$(this).attr('order-idx')].components, components, historyOrdersView);
+      });
 
       $.mobile.changePage("#history", { transition: "slideup" });
       container.trigger('create');

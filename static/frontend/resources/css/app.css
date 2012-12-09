@@ -47,3 +47,6 @@ h1.logo {
   margin: 30px auto;
   font-size: 50px;
 }
+#history .ui-listview {
+  margin-top: 0;
+}
