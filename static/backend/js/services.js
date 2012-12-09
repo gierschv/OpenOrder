@@ -9,5 +9,7 @@ angular.module('openorderServices', ['ngResource']).
       return $resource('/api/component.json');
     }).
     factory('Order', function($resource) {
-      return $resource('/api/order.json');
+      return $resource('/api/order.json/:action', {}, {
+        sell: {method: 'POST', params: { action: 'sell' }}
+      });
     });

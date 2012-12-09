@@ -136,21 +136,30 @@ function OrdersCtrl($location, $rootScope, $scope, $http, Component, Order) {
     });
   };
 
-  $scope.orderDetails = function(idx) {
-    $scope.detailedOrder = idx;
-    if ($scope.orders[idx].user != null && $scope.graphUsers[$scope.orders[idx].user] === undefined) {
-      $scope.updateGraph($scope.orders[idx].user);
-    }
+  $scope.orderDetails = function(id) {
+    $scope.detailedOrder = Order.get({ id: id }, function() {
+      if ($scope.detailedOrder.user != null && $scope.graphUsers[$scope.detailedOrder.user] === undefined) {
+        $scope.updateGraph($scope.detailedOrder.user);
+      }
 
-    $scope.detailedOrderPrice = 0;
-    for (var i = 0 ; i < $scope.orders[idx].components.length ; ++i) {
-      $scope.detailedOrderPrice += $scope.getComponentById($scope.orders[idx].components[i]).price;
-    }
+      $scope.detailedOrderPrice = 0;
+      for (var i = 0 ; i < $scope.detailedOrder.components.length ; ++i) {
+        $scope.detailedOrderPrice += $scope.getComponentById($scope.detailedOrder.components[i]).price;
+      }
 
-    $('#orderModal').modal('show');
+      $('#orderModal').modal('show');
+    });
   };
 
-  $scope.components = Component.query();
+  $scope.markSelled = function(id) {
+    $('#orderModal').modal('hide');
+    Order.sell({ api_key: $rootScope['profile']['api_key'], id: id }, function() {
+      $scope.orders = Order.query({ api_key: $rootScope['profile']['api_key'], filter: 'unsold' }, $scope.updateOrdersView);
+    });
+  };
+
+
+  $scope.components = Component.query({ api_key: $rootScope['profile']['api_key'] });
   $scope.getComponentById = function(id) {
     for (var i = 0 ; i < $scope.components.length ; ++i) {
       if ($scope.components[i].id === id) {
@@ -160,14 +169,15 @@ function OrdersCtrl($location, $rootScope, $scope, $http, Component, Order) {
     return null;
   };
 
-  $scope.graphUsers = {};
-  $scope.orders = Order.query({ api_key: $rootScope['profile']['api_key'] }, function() {
-    console.log($scope.orders);
+  $scope.updateOrdersView = function() {
     for (var i = 0 ; i < $scope.orders.length ; ++i) {
       $scope.orders[i].dateCreated = new Date($scope.orders[i].dateCreated * 1000);
       if ($scope.orders[i].user != null && $scope.graphUsers[$scope.orders[i].user] === undefined) {
         $scope.updateGraph($scope.orders[i].user);
       }
     }
-  });
+  };
+
+  $scope.graphUsers = {};
+  $scope.orders = Order.query({ api_key: $rootScope['profile']['api_key'], filter: 'unsold' }, $scope.updateOrdersView);
 }
