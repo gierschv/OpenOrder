@@ -32,6 +32,7 @@ class API(webapp2.RequestHandler):
 
     	else:
             self.response.headers['Content-Type'] = 'application/json'
+            self.response.headers['Access-Control-Allow-Origin'] = '*'
 
             args = {}
             for argumentName in self.request.arguments():
@@ -41,6 +42,7 @@ class API(webapp2.RequestHandler):
 
     def post(self):
         self.response.headers['Content-Type'] = 'text/plain'
+        self.response.headers['Access-Control-Allow-Origin'] = '*'
 
         mapping = {
             'step'                 : self.update_step,
@@ -67,6 +69,7 @@ class API(webapp2.RequestHandler):
 
     def delete(self):
         self.response.headers['Content-Type'] = 'text/plain'
+        self.response.headers['Access-Control-Allow-Origin'] = '*'
 
         mapping = {
             'step'           : self.remove_step,

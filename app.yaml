@@ -27,6 +27,10 @@ handlers:
   static_dir: static/frontend
 
 # App
+- url: /api/doc
+  static_dir: static/api
+  http_headers:
+    Access-Control-Allow-Origin: '*'
 - url: /api/.*
   script: main.app
 
