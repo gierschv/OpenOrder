@@ -81,6 +81,10 @@ class apiOrder():
 		q = Order.all()
 		return q.filter('Sold =', None).order('-dateCommand').fetch(limit=pLimit)
 
+	def getSoldOrder(self, pLimit):
+		q = Order.all()
+		return q.filter('Sold !=', None).order('-Sold').fetch(limit=pLimit)
+
 	def getUserOrder(self, id, pLimit):
 		q = Order.all()
 		return q.filter('User =', User.get_by_key_name(id).key()).order('-dateCommand').fetch(limit = pLimit)
@@ -99,6 +103,11 @@ class apiOrder():
 
 	def get(self, id):
 		return Order.get_by_id(id)
+
+	def setSold(self, idOrder, dateSold):
+		O = Order.get_by_id(idOrder)
+		O.Sold = dateSold
+		O.put()
 
 #
 #	Class apiFavoriteOder, manage operation on users favortie Order
