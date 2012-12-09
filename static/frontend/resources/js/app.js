@@ -293,7 +293,7 @@ $(document).ready(function() {
       });
 
       $.mobile.changePage("#history", { transition: "slideup" });
-      container.trigger('create');
+      container.listview("refresh");
     };
 
     // Data
