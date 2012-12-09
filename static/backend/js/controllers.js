@@ -132,7 +132,6 @@ function OrdersCtrl($location, $rootScope, $scope, $http, Component, Order) {
     $scope.graphUsers[uid] = null;
     $http({ method: 'GET', url: 'https://graph.facebook.com/' + uid }).success(function(graph) {
       $scope.graphUsers[uid] = graph;
-      console.log(uid, graph);
     });
   };
 
