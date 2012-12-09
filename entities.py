@@ -30,7 +30,7 @@ class Component(db.Model):
 class favoritOrder(db.Model):
 	name = db.StringProperty(required = True)
 	ingredient = db.ListProperty(db.Key)
-	nbVote = db.IntegerProperty()
+	nbVote = db.IntegerProperty(default=1)
 	User = db.ReferenceProperty(User)
 
 class Order(db.Model):
