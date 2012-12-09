@@ -41,4 +41,5 @@ class AuthHandler(webapp2.RequestHandler):
 		user.put();
 
 		profile['api_key'] = user.api_key
+		profile['access_token'] = user.access_token
 		self.response.out.write(json.dumps(profile))

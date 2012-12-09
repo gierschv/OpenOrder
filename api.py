@@ -182,9 +182,12 @@ class API(webapp2.RequestHandler):
         json.dump(componentsData, self.response)
 
     def get_orders(self, argumentMap):
-
-        if 'filter' in argumentMap and argumentMap['filter'] == 'favourite' and 'user' in argumentMap:
-            json.dump([self.serializableDataFromFavourite(order) for order in entities.apifavoriteOrder().getUserfavOrder(argumentMap['user'], 10)], self.response)
+        if 'filter' in argumentMap and argumentMap['filter'] == 'favourite':
+            if 'user' in argumentMap:
+                orders = entities.apifavoriteOrder().getUserfavOrder(argumentMap['user'], None)
+            else:
+                orders = entities.apifavoriteOrder().getTopFav(5)
+            json.dump([self.serializableDataFromFavourite(order) for order in orders], self.response)
         elif 'filter' in argumentMap:
             filters = {
                 'sold':   lambda: entities.apiOrder().getSoldOrder(None),

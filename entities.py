@@ -140,7 +140,7 @@ class apifavoriteOrder():
 		if pLimit == None:
 			return q.fetch(limit=nb)
 		else:
-			return q.fectch(limit = pLimit)
+			return q.fetch(limit = pLimit)
 
 	def delete(self, id):
 		O = favoritOrder.get_by_id(id)
