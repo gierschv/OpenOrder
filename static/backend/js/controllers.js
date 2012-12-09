@@ -121,11 +121,53 @@ function ComponentsCtrl($location, $rootScope, $scope, $timeout, Step, Component
   };
 }
 
-function OrdersCtrl($location, $rootScope) {
+function OrdersCtrl($location, $rootScope, $scope, $http, Component, Order) {
   if ($rootScope['profile'] === undefined) {
     return $location.path('/auth');
   }
-
   $('.navbar li.active').removeClass('active');
   $('.navbar li.nav-orders').addClass('active');
+
+  $scope.updateGraph = function(uid) {
+    $scope.graphUsers[uid] = null;
+    $http({ method: 'GET', url: 'https://graph.facebook.com/' + uid }).success(function(graph) {
+      $scope.graphUsers[uid] = graph;
+      console.log(uid, graph);
+    });
+  };
+
+  $scope.orderDetails = function(idx) {
+    $scope.detailedOrder = idx;
+    if ($scope.orders[idx].user != null && $scope.graphUsers[$scope.orders[idx].user] === undefined) {
+      $scope.updateGraph($scope.orders[idx].user);
+    }
+
+    $scope.detailedOrderPrice = 0;
+    for (var i = 0 ; i < $scope.orders[idx].components.length ; ++i) {
+      $scope.detailedOrderPrice += $scope.getComponentById($scope.orders[idx].components[i]).price;
+    }
+
+    $('#orderModal').modal('show');
+  };
+
+  $scope.components = Component.query();
+  $scope.getComponentById = function(id) {
+    for (var i = 0 ; i < $scope.components.length ; ++i) {
+      if ($scope.components[i].id === id) {
+        return $scope.components[i];
+      }
+    }
+    return null;
+  };
+
+  $scope.graphUsers = {};
+  $scope.orders = Order.query({ api_key: $rootScope['profile']['api_key'] }, function() {
+    console.log($scope.orders);
+    for (var i = 0 ; i < $scope.orders.length ; ++i) {
+      $scope.orders[i].dateCreated = new Date($scope.orders[i].dateCreated * 1000);
+      if ($scope.orders[i].user != null && $scope.graphUsers[$scope.orders[i].user] === undefined) {
+        $scope.updateGraph($scope.orders[i].user);
+      }
+    }
+  });
 }

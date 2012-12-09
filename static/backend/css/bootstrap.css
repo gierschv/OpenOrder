@@ -4798,3 +4798,6 @@ table th.actions {
   font-size: 20px;
   font-weight: 300;
 }
+.ng-orders #orderModal td {
+  border-top: 0;
+}
