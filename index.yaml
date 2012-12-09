@@ -20,6 +20,11 @@ indexes:
   properties:
   - name: Sold
   - name: dateCommand
+
+- kind: Order
+  properties:
+  - name: Sold
+  - name: dateCommand
     direction: desc
 
 - kind: Order
