@@ -43,16 +43,16 @@ class API(webapp2.RequestHandler):
         self.response.headers['Content-Type'] = 'text/plain'
 
         mapping = {
-            'step'                : self.update_step,
-            'step.json'           : self.update_step,
-            'component'           : self.update_component,
-            'component.json'      : self.update_component,
-            'order'               : self.update_order,
-            'order.json'          : self.update_order,
-            'order/sell'          : self.sell_order,
-            'order.json/sell'     : self.sell_order,
-            'order/favorite'      : self.add_order_to_favorites,
-            'order.json/favorite' : self.add_order_to_favorites
+            'step'                 : self.update_step,
+            'step.json'            : self.update_step,
+            'component'            : self.update_component,
+            'component.json'       : self.update_component,
+            'order'                : self.update_order,
+            'order.json'           : self.update_order,
+            'order/sell'           : self.sell_order,
+            'order.json/sell'      : self.sell_order,
+            'order/favourite'      : self.add_order_to_favourites,
+            'order.json/favourite' : self.add_order_to_favourites
         }
 
         # Recuperation de la methode appelee
@@ -372,7 +372,7 @@ class API(webapp2.RequestHandler):
 
         self.response.write(json.dumps({ 'success': True }))
 
-    def add_order_to_favorites(self):
+    def add_order_to_favourites(self):
         # Decode JSON
         data = {}
         try:
@@ -394,13 +394,13 @@ class API(webapp2.RequestHandler):
             self.response.write('Error: No order matching with order id "' + str(orderId) + '".\n')
             return
 
-        # Get the name given to the favorite
+        # Get the name given to the favourite
         if 'name' not in data:
-            self.response.write('Error: Missing favorite name.\n')
+            self.response.write('Error: Missing favourite name.\n')
             return
         orderName = data['name']
 
-        entities.apifavoriteOrder().add(order.ingredient, 0, order.User.key().name(), orderName)
+        entities.apifavouriteOrder().add(order.ingredient, 0, order.User.key().name(), orderName)
 
         json.dump({'success': True}, self.response)
 
