@@ -197,8 +197,6 @@ $(document).ready(function() {
               return false;
             });
         });
-
-
       });
     };
 
@@ -215,11 +213,54 @@ $(document).ready(function() {
   $('.newOrder').click(newOrderView);
   $('.NoFB').click(newOrderView);
 
+  // Helpers
+  var pad2 = function(number) {
+    return (number < 10 ? '0' : '') + number;
+  };
+
+  var getComponentById = function(components, id) {
+    for (var i = 0 ; i < components.length ; ++i) {
+      if (components[i].id === id) {
+        return components[i];
+      }
+    }
+
+    return null;
+  };
+
+  // Helper to calcul order price
+  var orderPrice = function(order, components) {
+    var price = 0;
+    for (var i = 0 ; i < order.components.length ; ++i) {
+      price += getComponentById(components, order.components[i]).price;
+    }
+    return price;
+  };
+
   // History Orders
   var historyOrdersView = function() {
-    var components = [];
-    $.get('/api/component.json', { api_key: profile.api_key }, function(result) {
+    var components, orders, order = $('#history');
+
+    // View
+    var updateDisplay = function() {
+      var container = order.find('.order-history').empty();
+      for (var i = orders.length - 1; i >= 0 ; i--) {
+        var date = new Date(orders[i].dateCreated * 1000);
+        container.append('<li><a>' + pad2(date.getDay()) + '/' + pad2(date.getMonth() + 1) + '/' + date.getFullYear() +
+                         ' <span class="ui-li-count">&pound; '+ toFixed(orderPrice(orders[i], components)) + '</span></a></li>');
+      }
+
+      $.mobile.changePage("#history", { transition: "slideup" });
+      container.trigger('create');
+    };
+
+    // Data
+    $.getJSON('/api/component.json', { api_key: profile.api_key }, function(result) {
       components = result;
+      $.getJSON('/api/order.json', { api_key: profile.api_key, user: profile.id }, function(result) {
+        orders = result;
+        return updateDisplay();
+      });
     });
 
     $.mobile.loading('show');
