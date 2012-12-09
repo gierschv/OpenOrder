@@ -186,7 +186,7 @@ class API(webapp2.RequestHandler):
             if 'user' in argumentMap:
                 orders = entities.apifavoriteOrder().getUserfavOrder(argumentMap['user'], None)
             else:
-                orders = entities.apifavoriteOrder().getTopFav(5)
+                orders = entities.apifavoriteOrder().getTopFav(10)
             json.dump([self.serializableDataFromFavourite(order) for order in orders], self.response)
         elif 'filter' in argumentMap:
             filters = {
