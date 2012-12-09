@@ -134,6 +134,19 @@ class API(webapp2.RequestHandler):
 
         return orderData
 
+    def serializableDataFromFavourite(self, order):
+        componentsIds = [componentKey.id() for componentKey in order.ingredient]
+
+        orderData = {
+            'components'  : componentsIds,
+            'user'        : order.User.key().name() if order.User else None,
+            'name'        : order.name,
+            'nbVote'      : order.nbVote,
+            'id'          : order.key().id()
+        }
+
+        return orderData
+
     #
     # GET methods
     #
@@ -167,7 +180,9 @@ class API(webapp2.RequestHandler):
 
     def get_orders(self, argumentMap):
 
-        if 'filter' in argumentMap:
+        if 'filter' in argumentMap and argumentMap['filter'] == 'favourite' and 'user' in argumentMap:
+            json.dump([self.serializableDataFromFavourite(order) for order in entities.apifavoriteOrder().getUserfavOrder(argumentMap['user'], 10)], self.response)
+        elif 'filter' in argumentMap:
             filters = {
                 'sold':   lambda: entities.apiOrder().getSoldOrder(None),
                 'unsold': lambda: entities.apiOrder().getCurrentOrder(None)

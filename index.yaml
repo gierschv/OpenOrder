@@ -26,3 +26,9 @@ indexes:
   properties:
   - name: User
   - name: dateCommand
+
+- kind: favoritOrder
+  properties:
+  - name: User
+  - name: nbVote
+    direction: desc
