@@ -1,0 +1,76 @@
+{
+    "apiVersion": "0.1",
+    "swaggerVersion": "1.1",
+    "basePath": "http://open-order.appspot.com/api",
+    "resourcePath": "/step",
+    "apis": [
+        {
+            "path": "/step.{format}",
+            "description": "Manage steps",
+            "operations": [
+                {
+                    "httpMethod": "POST",
+                    "summary": "Create or update a step",
+                    "notes": "This can only be done by an administrator user.",
+                    "responseClass": "void",
+                    "nickname": "createStep",
+                    "parameters": [
+                        {
+                            "description": "Created step name",
+                            "paramType": "body",
+                            "required": true,
+                            "allowMultiple": false,
+                            "dataType": "Step"
+                        }
+                    ]
+                },
+                {
+                    "httpMethod": "DELETE",
+                    "summary": "Delete a step",
+                    "notes": "This can only be done by an administrator user.",
+                    "responseClass": "void",
+                    "nickname": "deleteStep",
+                    "parameters": [
+                        {
+                            "name": "id",
+                            "description": "The id that needs to be deleted",
+                            "paramType": "path",
+                            "required": true,
+                            "allowMultiple": false,
+                            "dataType": "int"
+                        }
+                    ],
+                    "errorResponses": [
+                        {
+                            "code": 400,
+                            "reason": "Invalid id supplied"
+                        }
+                    ]
+                }
+            ]
+        }
+    ],
+    "models": {
+        "Step": {
+            "id": "Step",
+            "properties": {
+                "name": {
+                    "type": "string"
+                },
+                "number": {
+                    "type": "int"
+                },
+                "type": {
+                    "allowableValues": {
+                        "valueType": "LIST",
+                        "values": [
+                            "one",
+                            "multi"
+                        ]
+                    },
+                    "type": "string"
+                }
+            }
+        }
+    }
+}

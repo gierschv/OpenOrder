@@ -1,0 +1,11 @@
+{
+    "apiVersion": "0.1",
+    "swaggerVersion": "1.1",
+    "basePath": "http://open-order.appspot.com/api",
+    "apis": [
+        {
+            "path": "/doc/step.{format}",
+            "description": ""
+        }
+    ]
+}

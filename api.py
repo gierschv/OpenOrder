@@ -32,6 +32,7 @@ class API(webapp2.RequestHandler):
 
     	else:
             self.response.headers['Content-Type'] = 'application/json'
+            self.response.headers['Access-Control-Allow-Origin'] = '*'
 
             args = {}
             for argumentName in self.request.arguments():
@@ -41,6 +42,7 @@ class API(webapp2.RequestHandler):
 
     def post(self):
         self.response.headers['Content-Type'] = 'text/plain'
+        self.response.headers['Access-Control-Allow-Origin'] = '*'
 
         mapping = {
             'step'                 : self.update_step,
@@ -67,6 +69,7 @@ class API(webapp2.RequestHandler):
 
     def delete(self):
         self.response.headers['Content-Type'] = 'text/plain'
+        self.response.headers['Access-Control-Allow-Origin'] = '*'
 
         mapping = {
             'step'           : self.remove_step,
@@ -142,6 +145,19 @@ class API(webapp2.RequestHandler):
 
         return orderData
 
+    def serializableDataFromFavourite(self, order):
+        componentsIds = [componentKey.id() for componentKey in order.ingredient]
+
+        orderData = {
+            'components'  : componentsIds,
+            'user'        : order.User.key().name() if order.User else None,
+            'name'        : order.name,
+            'nbVote'      : order.nbVote,
+            'id'          : order.key().id()
+        }
+
+        return orderData
+
     #
     # GET methods
     #
@@ -184,7 +200,13 @@ class API(webapp2.RequestHandler):
             return self.abort(403)
 
 
-        if 'filter' in argumentMap:
+        if 'filter' in argumentMap and argumentMap['filter'] == 'favourite':
+            if 'user' in argumentMap:
+                orders = entities.apifavoriteOrder().getUserfavOrder(argumentMap['user'], None)
+            else:
+                orders = entities.apifavoriteOrder().getTopFav(10)
+            json.dump([self.serializableDataFromFavourite(order) for order in orders], self.response)
+        elif 'filter' in argumentMap:
             filters = {
                 'sold':   lambda: entities.apiOrder().getSoldOrder(None),
                 'unsold': lambda: entities.apiOrder().getCurrentOrder(None)

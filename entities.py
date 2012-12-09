@@ -12,8 +12,8 @@ class User(db.Model):
 	access_token = db.StringProperty()
 	first_name = db.StringProperty()
 	last_name = db.StringProperty()
-	active = db.BooleanProperty()
-	admin = db.BooleanProperty()
+	active = db.BooleanProperty(default=True)
+	admin = db.BooleanProperty(default=False)
 
 class Step(db.Model):
 	name = db.StringProperty()
@@ -30,7 +30,7 @@ class Component(db.Model):
 class favoritOrder(db.Model):
 	name = db.StringProperty(required = True)
 	ingredient = db.ListProperty(db.Key)
-	nbVote = db.IntegerProperty()
+	nbVote = db.IntegerProperty(default=1)
 	User = db.ReferenceProperty(User)
 
 class Order(db.Model):
@@ -49,6 +49,21 @@ class apiUser():
 	def getApiKey(self, ApiKey):
 		q = User.all()
 		return q.filter('api_key =', ApiKey).get()
+
+	def Update(self, firstname, lastname, pActive, pAdmin, id):
+		q = User.get_by_key_name(id)
+		if q == None:
+			return None
+		if firstname != None:
+			q.first_name = firstname
+		if lastname != None:
+			q.last_name = lastname
+		if active != None:
+			q.active = pActive
+		if admin != None:
+			q.admin = pAdmin
+		q.put()
+		return q
 
 #
 #	Class to get back any kind of entities. request is based on the key, useful with foreign key
@@ -119,8 +134,13 @@ class apifavoriteOrder():
 		O = favoritOrder(ingredient=listCom, nbVote=nbVote, User=User.get_by_key_name(idUser).key(), name=pname)
 		O.put()
 
-	def search():
-		pass
+	def getTopFav(self, pLimit):
+		q = favoritOrder.all().order('-nbVote')
+		nb = q.count()
+		if pLimit == None:
+			return q.fetch(limit=nb)
+		else:
+			return q.fetch(limit = pLimit)
 
 	def delete(self, id):
 		O = favoritOrder.get_by_id(id)
@@ -135,8 +155,12 @@ class apifavoriteOrder():
 		O.put()
 	
 	def getUserfavOrder(self, id, pLimit):
-		q = favoritOrder.all()
-		return q.filter('User =', User.get_by_key_name(id).key()).order('-nbVote').fetch(limit = pLimit)
+		if pLimit == None:
+			q = favoritOrder.all().filter('User =', User.get_by_key_name(id).key())
+			nb = q.count()
+			return q.order('-nbVote').fetch(limit = nb)
+		else:	
+			return q.order('-nbVote').fetch(limit = pLimit)
 
 	def get(self, id):
 		return favoritOrder.get_by_id(id)
