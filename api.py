@@ -178,6 +178,14 @@ class API(webapp2.RequestHandler):
             else:
                 orders = [self.serializableDataFromOrder(order) for order in filters[filter]()]
                 json.dump(orders, self.response)
+        elif 'user' in argumentMap:
+            user = entities.apiUser().get(argumentMap['user'])
+            if user == None:
+                self.response.write('Error: No user found with specified id "' + argumentMap['user'] + '".\n')
+                return
+            orders = [self.serializableDataFromOrder(order) for order in entities.apiOrder().getUserOrder(argumentMap['user'], None)]
+            json.dump(orders, self.response)
+
         else:
             # All orders of just a specific one
             if 'id' in argumentMap:

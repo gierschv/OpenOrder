@@ -21,3 +21,8 @@ indexes:
   - name: Sold
   - name: dateCommand
     direction: desc
+
+- kind: Order
+  properties:
+  - name: User
+  - name: dateCommand
