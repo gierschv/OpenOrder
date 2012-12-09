@@ -429,7 +429,7 @@ class API(webapp2.RequestHandler):
             return
         orderName = data['name']
 
-        entities.apifavouriteOrder().add(order.ingredient, 0, order.User.key().name(), orderName)
+        entities.apifavoriteOrder().add(order.ingredient, 0, order.User.key().name(), orderName)
 
         json.dump({'success': True}, self.response)
 

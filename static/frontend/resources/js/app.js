@@ -12,21 +12,11 @@ $(document).ready(function() {
   var eventLogin = function(response) {
     if (response.status === 'connected') {
       accessToken = response.authResponse.accessToken;
-      var url_friends =  "https://graph.facebook.com/fql?q=SELECT%20name,%20uid,%20pic_square%20FROM%20user%20WHERE%20has_added_app=1%20and%20uid%20IN%20(SELECT%20uid2%20FROM%20friend%20WHERE%20uid1%20=%20805037276)&access_token="+ accessToken;
-      alreadyConnected = 1;
-      $.get(url_friends, null, function (data) {
-        friends_obj = $.parseJSON(data);
-        for (i = 0; i < 2; i++) {
-          $("#friends_list").append("<li><a href=''><img id='friend_pic_"+i+"' src='"+friends_obj.data[i].pic_square+"' align='middle'/><h3 id='friend_name_" + i + "'>"+friends_obj.data[i].name+"</h3></a></li>").trigger("create");
-        }
-        $("#friends_list").append("<li><a href='#friendsAll'><h3 id='friends_all'> All my friends </h3></a></li>").trigger("create");
-        $("#friends_list").listview("refresh");
-        for (i = 0; i < friends_obj.data.length; i++) {
-          $("#friends_all_page").append("<li><a href=''><h3 id='friend_name_" + i + "'>"+friends_obj.data[i].name+"</h3><img id='friend_pic_"+i+"' src='"+friends_obj.data[i].pic_square+"' /></a></li>").trigger("create");
-        }
-      });
       if (profile.api_key === undefined) {
-        $.get('/api/auth', response.authResponse , function (data) {
+        if ($.mobile.activePage.data('url') !== 'splash') {
+          $.mobile.changePage("#splash", { transition: "pop" });
+        }
+        $.get('/api/auth', response.authResponse, function (data) {
           profile = JSON.parse(data);
           $('.user-logged').show();
           $.mobile.changePage("#homeFB", { transition: "slideup" });
@@ -236,7 +226,7 @@ $(document).ready(function() {
             $('.order-id').text(result['orderId']);
             $.mobile.changePage("#order-completed", { transition: "pop" });
 
-            $('.order-favourite').click(function() {
+            $('.order-favourite').unbind().click(function() {
               if ($('#order-favourite-name').val() === '') {
                 return false;
               }
@@ -317,5 +307,115 @@ $(document).ready(function() {
 
     $.mobile.loading('show');
   };
+  
   $('.historyOrders').click(historyOrdersView);
+
+  // Favourite Orders
+  var favouriteOrdersView = function(type) {
+    var components, orders, order = $('#favourites');
+
+    var updateDisplay = function() {
+      var container = order.find('.order-favourite').empty();
+      for (var i = 0 ; i < orders.length ; ++i) {
+        // me
+        if (orders[i].user === undefined) {
+          container.append('<li><a href="" class="favourite-reorder" order-idx="' + i + '">' + orders[i].name +
+                           ' <span class="ui-li-count">&pound; '+ toFixed(orderPrice(orders[i], components)) + '</span></a></li>');
+        }
+        // friends
+        else {
+          container.append('<li><a href="" class="favourite-reorder" order-idx="' + i + '"><img src="' +  orders[i].user.pic_square + '" /><h3>' + orders[i].name +
+                           '</h3><p>By ' + orders[i].user.name + '</p> <span class="ui-li-count">&pound; '+ toFixed(orderPrice(orders[i], components)) + '</span></a></li>');
+        }
+      }
+
+      // Re-order an favourite command
+      $('.favourite-reorder').unbind().click(function() {
+        return newOrderView(orders[$(this).attr('order-idx')].components, components, function() {
+          return favouriteOrdersView(type);
+        });
+      });
+
+      $.mobile.changePage("#favourites", { transition: "slideup" });
+      container.listview("refresh");
+    };
+
+    // Data
+    $.getJSON('/api/component.json', { api_key: profile.api_key }, function(result) {
+      components = result;
+
+      order.find('h1').hide();
+      // My favourites
+      if (type === 'me') {
+        order.find('.me').show();
+        $.getJSON('/api/order.json', { api_key: profile.api_key, user: profile.id, filter: 'favourite' }, function(result) {
+          orders = result;
+          return updateDisplay();
+        });
+      }
+      else if (type === 'friends') {
+        order.find('.friends').show();
+
+        var fql = 'SELECT name, uid, pic_square FROM user WHERE has_added_app = 1 and uid IN (SELECT uid2 FROM friend WHERE uid1 = me())',
+            friends, fcur = 0;
+        
+        var getFriendsFavourites = function(uid, idx) {
+          $.getJSON('/api/order.json', { api_key: profile.api_key, user: uid, filter: 'favourite' }, function(result) {
+            friends[idx].orders = result;
+            if (++fcur === friends.length) {
+              return getTopFriendsFavourites();
+            }
+          });
+        };
+
+        var getTopFriendsFavourites = function() {
+          // Set up an array of orders with ref on users
+          orders = [];
+          for (var i = 0 ; i < friends.length ; ++i) {
+            for (var j = 0 ; j < friends[i].orders.length ; ++j) {
+              orders.push(friends[i].orders[j]);
+              orders[orders.length - 1].user = friends[i];
+            }
+          }
+
+          // Sort orders by hit
+          var sortByHit = function(a, b) {
+            if (a.nbVote > b.nbVote) return -1;
+            if (a.nbVote < b.nbVote) return 1;
+            return 0;
+          };
+          orders.sort(sortByHit);
+
+          // Display orders
+          return updateDisplay();
+        };
+
+        // Load FB graph
+        $.getJSON('https://graph.facebook.com/fql?access_token=' + profile.access_token + '&q=' + encodeURIComponent(fql), function(graph) {
+          friends = graph.data;
+          for (var i = 0 ; i < friends.length ; ++i) {
+            getFriendsFavourites(friends[i].uid, i);
+          }
+        });
+
+        // var url_friends =  "https://graph.facebook.com/fql?q=SELECT%20name,%20uid,%20pic_square%20FROM%20user%20WHERE%20has_added_app=1%20and%20uid%20IN%20(SELECT%20uid2%20FROM%20friend%20WHERE%20uid1%20=%20805037276)&access_token="+ accessToken;
+        // $.get(url_friends, null, function (data) {
+        //   friends_obj = $.parseJSON(data);
+        //   for (i = 0; i < 2; i++) {
+        //     $("#friends_list").append("<li><a href=''><img id='friend_pic_"+i+"' src='"+friends_obj.data[i].pic_square+"' align='middle'/><h3 id='friend_name_" + i + "'>"+friends_obj.data[i].name+"</h3></a></li>").trigger("create");
+        //   }
+        //   $("#friends_list").append("<li><a href='#friendsAll'><h3 id='friends_all'> All my friends </h3></a></li>").trigger("create");
+        //   $("#friends_list").listview("refresh");
+        //   for (i = 0; i < friends_obj.data.length; i++) {
+        //     $("#friends_all_page").append("<li><a href=''><h3 id='friend_name_" + i + "'>"+friends_obj.data[i].name+"</h3><img id='friend_pic_"+i+"' src='"+friends_obj.data[i].pic_square+"' /></a></li>").trigger("create");
+        //   }
+        // });
+      }
+    });
+
+    $.mobile.loading('show');
+    return false;
+  };
+  $('.favouriteOrders').unbind().click(function() { return favouriteOrdersView('me'); });
+  $('.favouriteFriendsOrders').unbind().click(function() { return favouriteOrdersView('friends'); });
 });
