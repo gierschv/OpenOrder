@@ -322,6 +322,7 @@ class API(webapp2.RequestHandler):
         orderDateCreation = orderData.pop('dateCreation', time.time())
         orderDateSelling  = orderData.pop('dateSelling', None)
         orderId           = orderData.pop('id', None)
+        orderFId          = orderData.pop('fid', None)
 
         # Check API key
         if orderData.has_key('api_key'):
@@ -362,6 +363,13 @@ class API(webapp2.RequestHandler):
             for i in range(compQuantity):
                 componentsIds.append(long(compId))
 
+        # Favorite Hits
+        if orderFId != None:
+            favourite = entities.apifavoriteOrder().get(orderFId)
+            if not favourite:
+                return slef.abort(400)
+            favourite.nbVote += 1
+            favourite.put()
 
         # Ajout/Update de l'order
         # TODO: Checker si les components sont bien du bon type (id ? key ? Component ?)

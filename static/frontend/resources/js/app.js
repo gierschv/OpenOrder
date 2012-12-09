@@ -94,7 +94,7 @@ $(document).ready(function() {
   };
 
   // Create the new order view
-  var newOrderView = function(importOrderComponents, importComponents, importPreviousPage) {
+  var newOrderView = function(importOrderComponents, importComponents, importPreviousPage, fid) {
     var order = $('#order'), orderFooter = order.find('div[data-role="footer"]'),
         steps = [], newOrder = [], total = 0;
 
@@ -221,7 +221,7 @@ $(document).ready(function() {
           }
         }
 
-        $.post('/api/order.json', JSON.stringify({ api_key: profile.api_key, components: components }), function(result) {
+        $.post('/api/order.json', JSON.stringify({ api_key: profile.api_key, components: components, fid: fid }), function(result) {
           result = JSON.parse(result);
             $('.order-id').text(result['orderId']);
             $.mobile.changePage("#order-completed", { transition: "pop" });
@@ -318,7 +318,7 @@ $(document).ready(function() {
       var container = order.find('.order-favourite').empty();
       for (var i = 0 ; i < orders.length ; ++i) {
         // me
-        if (orders[i].user === undefined) {
+        if (typeof(orders[i].user) !== 'object') {
           container.append('<li><a href="" class="favourite-reorder" order-idx="' + i + '">' + orders[i].name +
                            ' <span class="ui-li-count">&pound; '+ toFixed(orderPrice(orders[i], components)) + '</span></a></li>');
         }
@@ -333,7 +333,7 @@ $(document).ready(function() {
       $('.favourite-reorder').unbind().click(function() {
         return newOrderView(orders[$(this).attr('order-idx')].components, components, function() {
           return favouriteOrdersView(type);
-        });
+        }, orders[$(this).attr('order-idx')].id);
       });
 
       $.mobile.changePage("#favourites", { transition: "slideup" });
@@ -411,7 +411,7 @@ $(document).ready(function() {
           });
         }
         else {
-          $.getJSON('http://localhost:8081/api/order.json?filter=favourite', { api_key: profile.api_key }, function(result) {
+          $.getJSON('/api/order.json?filter=favourite', { api_key: profile.api_key }, function(result) {
             orders = result;
             for (var i = 0 ; i < orders.length ; ++i) {
               getAllgraph(i);
