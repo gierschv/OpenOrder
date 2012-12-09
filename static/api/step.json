@@ -1,7 +1,7 @@
 {
     "apiVersion": "0.1",
     "swaggerVersion": "1.1",
-    "basePath": "http://localhost:8081/api",
+    "basePath": "http://open-order.appspot.com/api",
     "resourcePath": "/step",
     "apis": [
         {
