@@ -98,6 +98,14 @@ class API(webapp2.RequestHandler):
     # Utils
     #
 
+    def checkApiKeyIsAdmin(self, apiKey):
+        if not apiKey:
+            return False
+        apiUser = entities.apiUser().getApiKey(apiKey)
+        if not apiUser or not apiUser.admin:
+            return False
+        return True
+
     def checkRequiredKeys(self, dictionary, requiredKeys):
         missingRequiredKey = False
         for requiredKey in requiredKeys:
@@ -182,6 +190,16 @@ class API(webapp2.RequestHandler):
         json.dump(componentsData, self.response)
 
     def get_orders(self, argumentMap):
+
+        # Check API key
+        apiKey = argumentMap.get('api_key')
+        if not apiKey:
+            return self.abort(403)
+        apiUser = entities.apiUser().getApiKey(apiKey)
+        if not apiUser:
+            return self.abort(403)
+
+
         if 'filter' in argumentMap and argumentMap['filter'] == 'favourite':
             if 'user' in argumentMap:
                 orders = entities.apifavoriteOrder().getUserfavOrder(argumentMap['user'], None)
@@ -197,24 +215,41 @@ class API(webapp2.RequestHandler):
             if filter not in filters:
                 self.response.write('Warning: Ignoring unrecognized specified filter "' + argumentMap['filter'] + '".\n')
             else:
-                orders = [self.serializableDataFromOrder(order) for order in filters[filter]()]
+                if apiUser.admin:
+                    # Fetch all orders
+                    orders = [self.serializableDataFromOrder(order) for order in filters[filter]()]
+                else:
+                    # Fetch only the user's orders
+                    orders = [self.serializableDataFromOrder(order) for order in filters[filter]() if order.User and order.User.key() == apiUser.key()]
                 json.dump(orders, self.response)
+
         elif 'user' in argumentMap:
             user = entities.apiUser().get(argumentMap['user'])
             if user == None:
                 self.response.write('Error: No user found with specified id "' + argumentMap['user'] + '".\n')
                 return
-            orders = [self.serializableDataFromOrder(order) for order in entities.apiOrder().getUserOrder(argumentMap['user'], None)]
-            json.dump(orders, self.response)
+
+            if apiUser.admin or apiUser.key() == user.key():
+                orders = [self.serializableDataFromOrder(order) for order in entities.apiOrder().getUserOrder(argumentMap['user'], None)]
+                json.dump(orders, self.response)
+            else:
+                return self.abort(403)
 
         else:
             # All orders of just a specific one
             if 'id' in argumentMap:
                 order = entities.apiOrder().get(long(argumentMap['id']))
-                if order:
-                    json.dump(self.serializableDataFromOrder(order), self.response)
+                if apiUser.admin or (order.User and apiUser.key() == order.User.key()):
+                    if order:
+                        json.dump(self.serializableDataFromOrder(order), self.response)
+                else:
+                    return self.abort(403)
             else:
-                orders = entities.apiOrder().getAll(None)
+                # Only an admin can list all orders
+                if apiUser.admin:
+                    orders = entities.apiOrder().getAll(None)
+                else:
+                    orders = entities.apiOrder().getUserOrder(apiUser.key().name(), None)
 
                 ordersData = []
                 for order in orders:
@@ -236,6 +271,10 @@ class API(webapp2.RequestHandler):
             self.response.write('Invalid JSON')
             return
 
+        # Check API key
+        if not self.checkApiKeyIsAdmin(stepDescription.get('api_key')):
+            return self.abort(403)
+
         # Check si tous les champs sont presents dans les donnees POST
         requiredKeys = ['name', 'number', 'type']
         if not self.checkRequiredKeys(stepDescription, requiredKeys):
@@ -249,10 +288,6 @@ class API(webapp2.RequestHandler):
         stepIndex = stepDescription.pop('number')
         stepType  = stepDescription.pop('type')
         stepId    = stepDescription.pop('id', None)
-
-        # On previent qu'on ignore les donnees inutiles
-        for extraKey in stepDescription:
-            self.response.write('Ignoring extra key "' + extraKey + '"\n')
 
         # Si argument 'id' dans la query string, alors update, sinon add
         if stepId != None:
@@ -272,6 +307,10 @@ class API(webapp2.RequestHandler):
             self.response.write('Invalid JSON')
             return
 
+        # Check API key
+        if not self.checkApiKeyIsAdmin(stepDescription.get('api_key')):
+            return self.abort(403)
+
         # Check si tous les champs sont presents dans les donnees POST
         requiredKeys = ['name', 'stock', 'price', 'step']
         if not self.checkRequiredKeys(componentDescription, requiredKeys):
@@ -286,10 +325,6 @@ class API(webapp2.RequestHandler):
         compPrice = componentDescription.pop('price')
         compStep  = componentDescription.pop('step')
         compId    = componentDescription.pop('id', None)
-
-        # On previent qu'on ignore les donnees inutiles
-        for extraKey in componentDescription:
-            self.response.write('Ignoring extra key "' + extraKey + '"\n')
 
         # Si argument 'id' dans la query string, alors update, sinon add
         if compId != None:
@@ -325,11 +360,12 @@ class API(webapp2.RequestHandler):
         orderFId          = orderData.pop('fid', None)
 
         # Check API key
+        apiUser = None
         if orderData.has_key('api_key'):
-            user = entities.apiUser().getApiKey(orderData['api_key'])
-            if not user:
+            apiUser = entities.apiUser().getApiKey(orderData['api_key'])
+            if not apiUser:
                 return self.abort(403)
-            orderUser = user.key().name()
+            orderUser = apiUser.key().name()
         else:
             orderUser = None
 
@@ -372,9 +408,9 @@ class API(webapp2.RequestHandler):
             favourite.put()
 
         # Ajout/Update de l'order
-        # TODO: Checker si les components sont bien du bon type (id ? key ? Component ?)
-        # TODO: Checker pourquoi une seule date en parametre
         if orderId != None:
+            if not apiUser or not apiUser.admin:
+                return self.abort(403)
             order = entities.apiOrder().update(componentsIds, long(orderId), datetime.datetime.fromtimestamp(orderDateSelling), str(orderUser))
             self.response.write(json.dumps({ 'orderId': order.key().id() }))
         else:
@@ -390,6 +426,10 @@ class API(webapp2.RequestHandler):
         except ValueError:
             self.response.write('Invalid JSON')
             return
+
+        # Check API key
+        if not self.checkApiKeyIsAdmin(data.get('api_key')):
+            return self.abort(403)
 
         # Get order id
         if 'id' not in data:
@@ -418,6 +458,14 @@ class API(webapp2.RequestHandler):
             self.response.write('Invalid JSON')
             return
 
+        # Check API key
+        apiKey = data.get('api_key')
+        if not apiKey:
+            return self.abort(403)
+        apiUser = self.apiUser.getApiKey(apiKey)
+        if not apiUser:
+            return self.abort(403)
+
         # Get order id
         if 'id' not in data:
             self.response.write('Error: Missing order id.\n')
@@ -437,7 +485,12 @@ class API(webapp2.RequestHandler):
             return
         orderName = data['name']
 
-        entities.apifavoriteOrder().add(order.ingredient, 0, order.User.key().name(), orderName)
+        # If the apiUser is an admin, he can specify another user who the order will be favourite to
+        user = data.get('user')
+        if apiUser.admin and user:
+            entities.apifavouriteOrder().add(order.ingredient, 0, user.key().name(), orderName)
+        else:
+            entities.apifavouriteOrder().add(order.ingredient, 0, apiUser.key().name(), orderName)
 
         json.dump({'success': True}, self.response)
 
@@ -446,6 +499,10 @@ class API(webapp2.RequestHandler):
     #
 
     def remove_step(self, queryStringArguments):
+
+        # Check API key
+        if not self.checkApiKeyIsAdmin(queryStringArguments.get('api_key')):
+            return self.abort(403)
 
         # Check si le nom de la step est present
         requiredKeys = ['id']
@@ -458,16 +515,16 @@ class API(webapp2.RequestHandler):
         # Recuperation du nom de la step
         stepId = queryStringArguments.pop('id')
 
-        # On previent qu'on ignore les donnees inutiles
-        for extraArg in queryStringArguments:
-            self.response.write('Ignoring extra argument "' + extraArg + '"\n')
-
         # Suppression de la step
         entities.apiStep().delete(long(stepId))
 
         self.response.write('Step ' + str(stepId) + ' removed successfully.')
 
     def remove_component(self, queryStringArguments):
+
+        # Check API key
+        if not self.checkApiKeyIsAdmin(queryStringArguments.get('api_key')):
+            return self.abort(403)
 
         # Check si l'id du component est present
         requiredKeys = ['id']
@@ -480,16 +537,17 @@ class API(webapp2.RequestHandler):
         # Recuperation de l'id du component
         compId = queryStringArguments.pop('id')
 
-        # On previent qu'on ignore les donnees inutiles
-        for extraArg in queryStringArguments:
-            self.response.write('Ignoring extra argument "' + extraArg + '"\n')
-
         # Suppression du component
         entities.apiComponent().delete(long(compId))
 
         self.response.write('Component ' + str(compId) + ' removed successfully.\n')
 
     def remove_order(self, queryStringArguments):
+
+        # Check API key
+        if not self.checkApiKeyIsAdmin(queryStringArguments.get('api_key')):
+            return self.abort(403)
+
         # Check si l'id de l'order est present
         requiredKeys = ['id']
         if not self.checkRequiredKeys(queryStringArguments, requiredKeys):
@@ -500,10 +558,6 @@ class API(webapp2.RequestHandler):
 
         # Recuperation de l'id de l'order
         orderId = queryStringArguments.pop('id')
-
-        # On previent qu'on ignore les arguments inutiles
-        for extraArg in queryStringArguments:
-            self.response.write('Ignoring extra argument "' + extraArg + '"\n')
 
         # Suppression de l'order
         entities.apiOrder().delete(long(orderId))
