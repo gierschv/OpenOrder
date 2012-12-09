@@ -186,8 +186,14 @@ $(document).ready(function() {
             $('.order-id').text(result['orderId']);
             $.mobile.changePage("#order-completed", { transition: "pop" });
 
-            $('.order-favorite').click(function() {
-              // TODO
+            $('.order-favourite').click(function() {
+              if ($('#order-favourite-name').val() === '') {
+                return false;
+              }
+
+              $.post('/api/order.json/favourite', JSON.stringify({ api_key: profile.api_key, id: result['orderId'], name: $('#order-favourite-name').val() }), function() {
+                $.mobile.changePage("#homeFB", { transition: "slidedown" });
+              });
               return false;
             });
         });
@@ -208,4 +214,15 @@ $(document).ready(function() {
 
   $('.newOrder').click(newOrderView);
   $('.NoFB').click(newOrderView);
+
+  // History Orders
+  var historyOrdersView = function() {
+    var components = [];
+    $.get('/api/component.json', { api_key: profile.api_key }, function(result) {
+      components = result;
+    });
+
+    $.mobile.loading('show');
+  };
+  $('.historyOrders').click(historyOrdersView);
 });

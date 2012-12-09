@@ -8,7 +8,7 @@
 	<link rel="stylesheet" href="/static/frontend/resources/css/app.css" />
 </head> 
 <body> 
-	<!-- Start of first page: #splash -->
+	<!-- #splash -->
 	<div data-role="page" id="splash">
 		<div data-role="content">
 			<img src="/static/frontend/resources/images/logo-250.png">
@@ -16,7 +16,7 @@
 		</div>
 	</div>
 
-	<!-- Start of first page: #login -->
+	<!-- #login -->
 	<div data-role="page" id="login">
 		<div data-role="content">
 			<div class="logo"><img src="/static/frontend/resources/images/logo-250.png"></div>
@@ -25,41 +25,33 @@
 		</div>
 	</div>
 
-	<!-- Start of second page: #homeFB -->
+	<!-- #homeFB -->
 	<div data-role="page" id="homeFB">
 		<div data-role="header">
 			<h1 class="logo"><img src="/static/frontend/resources/images/logo-100.png"></h1>
-		</div><!-- /header -->
+		</div>
 		<div data-role="content">	
 			<ul data-role="listview">
 				<li>
-					<a href="" class="newOrder">
+					<a class="newOrder">
 						<h3>New order</h3>
 						<p>Start a new order</p>
 					</a>
 				</li>
 				<li>
-					<h3>My last orders</h3>
-					<p>Re-order my previous commands.</p>
-					<span class="ui-li-count">3</span>
-					<ul>
-						<li><a href="http://www.hristu.net/">Selection1</a></li>
-						<li><a href="http://www.hristu.net/">Selection2</a></li>
-						<li><a href="http://www.hristu.net/">Selection3</a></li>
-					</ul>
+					<a class="historyOrders">
+						<h3>My last orders</h3>
+						<p>Re-order my previous orders</p>
+					</a>
 				</li>
 				<li>
-					<h3>My favourites orders</h3>
-					<p>Re-order a favourite order.</p>
-					<span class="ui-li-count">3</span>
-					<ul>
-						<li><a href="http://www.hristu.net/">Selection1</a></li>
-						<li><a href="http://www.hristu.net/">Selection2</a></li>
-						<li><a href="http://www.hristu.net/">Selection3</a></li>
-					</ul>
+					<a class="favouriteOrders">
+						<h3>My favourite orders</h3>
+						<p>Re-order a favourite order</p>
+					</a>
 				</li>
 			</ul>
-			<h4>Friends</h4>
+			<!-- <h4>Friends</h4>
 			<ul id="friends_list" data-role="listview">
 			</ul>
 			<h4>Most famous orders</h4>
@@ -67,7 +59,7 @@
 				<li><a href="http://www.hristu.net/">Best sandwich ever</a></li>
 				<li><a href="http://www.hristu.net/">Not too bad</a></li>
 				<li><a href="http://www.hristu.net/">Ewwww</a></li>
-			</ul>
+			</ul> -->
 		</div><!-- /content -->
 	</div><!-- /page home -->
 	<!-- #friends_all -->
@@ -79,8 +71,8 @@
 			<ul id="friends_all_page" data-role="listview">
 				
 			</ul>
-		</div><!-- /content -->
-	</div><!-- /page #friends_all -->
+		</div>
+	</div>
 
 	<!-- #order -->
 	<div data-role="page" id="order">
@@ -88,7 +80,7 @@
 			<a href="" data-icon="arrow-l" class="order-previous">Previous</a>
 			<h1 class="logo"><img src="/static/frontend/resources/images/logo-100.png"></h1>
 			<a href="" data-icon="check" class="order-validate">Validate</a>
-		</div><!-- /header -->
+		</div>
 		<div data-role="content">
 			<p class="step-desc step-one">Select one item below:</p>
 			<p class="step-desc step-multiple">Select optionals items below:</p>
@@ -108,7 +100,7 @@
 		<div data-role="header">
 			<a href="/" data-icon="home" class="home">Home</a>
 			<h1 class="logo"><img src="/static/frontend/resources/images/logo-100.png"></h1>
-		</div><!-- /header -->
+		</div>
 		<div data-role="content">
 			<p>Thank you for your order. You will be able to retrieve it soon with the number below:</p>
 			<div class="order-id">0</div>
@@ -116,10 +108,32 @@
 			<div class="user-logged">
 				<h4>Add this order as favourite</h4>
 				<div data-role="fieldcontain">
-				    <input type="text" name="name" id="name" placeholder="Name of the order" />
-					<a href="" data-role="button" class="order-favorite">Add as favourite</a>
+				    <input type="text" name="name" id="order-favourite-name" placeholder="Name of the order" />
+					<a href="" data-role="button" class="order-favourite">Add as favourite</a>
 				</div>
 			</div>
+		</div>
+	</div>
+
+	<!-- #history -->
+	<div data-role="page" id="history">
+		<div data-role="header">
+			<a href="#homeFB" data-icon="home" class="home">Home</a>
+			<h1 class="logo"><img src="/static/frontend/resources/images/logo-100.png"></h1>
+		</div>
+		<div data-role="content">
+			
+		</div>
+	</div>
+
+	<!-- #favourites -->
+	<div data-role="page" id="favourites">
+		<div data-role="header">
+			<a href="#homeFB" data-icon="home" class="home">Home</a>
+			<h1 class="logo"><img src="/static/frontend/resources/images/logo-100.png"></h1>
+		</div>
+		<div data-role="content">
+			
 		</div>
 	</div>
 
