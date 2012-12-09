@@ -116,18 +116,18 @@ class apiOrder():
 
 class apifavoriteOrder():
 	def add(self, listCom, nbVote, idUser, pname):
-		O = FavOrder(ingredient=listCom, nbVote=nbVote, User=User.get_by_key_name(idUser).key(), name=pname)
+		O = favoritOrder(ingredient=listCom, nbVote=nbVote, User=User.get_by_key_name(idUser).key(), name=pname)
 		O.put()
 
 	def search():
 		pass
 
 	def delete(self, id):
-		O = FavOrder.get_by_id(id)
+		O = favoritOrder.get_by_id(id)
 		O.delete()
 	
 	def update(self, ingredient, idFav, pName, pNbVote, idUser):
-		O = FavOrder.get_by_id(idFav)
+		O = favoritOrder.get_by_id(idFav)
 		O.ingredient = ingredient
 		O.name = pName
 		O.User = User.get_by_key_name(idUser).key()
