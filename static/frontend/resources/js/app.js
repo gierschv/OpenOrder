@@ -283,7 +283,7 @@ $(document).ready(function() {
       var container = order.find('.order-history').empty();
       for (var i = orders.length - 1; i >= 0 ; i--) {
         var date = new Date(orders[i].dateCreated * 1000);
-        container.append('<li><a href="" class="history-reorder" order-idx="' + i + '">' + pad2(date.getDay()) + '/' + pad2(date.getMonth() + 1) + '/' + date.getFullYear() +
+        container.append('<li><a href="" class="history-reorder" order-idx="' + i + '">' + pad2(date.getDate()) + '/' + pad2(date.getMonth() + 1) + '/' + date.getFullYear() +
                          ' <span class="ui-li-count">&pound; '+ toFixed(orderPrice(orders[i], components)) + '</span></a></li>');
       }
 
