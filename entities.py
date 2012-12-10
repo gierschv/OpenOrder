@@ -44,7 +44,9 @@ class apiUser():
 		return User.get_by_key_name(id)
 
 	def delete(self, idUser):
-		User.get_by_key_name(idUser).delete()
+		u = User.get_by_key_name(idUser)
+		if u:
+			u.delete()
 
 	def getApiKey(self, ApiKey):
 		q = User.all()
@@ -106,23 +108,26 @@ class apiOrder():
 
 
 	def delete(self, idOrder):
-		O = Order.get_by_id(kidOrder)
-		O.delete()
+		O = Order.get_by_id(idOrder)
+		if O:
+			O.delete()
 	
 	def update(self, components, idOrder, dateSoldOut, idUser):
 		O = Order.get_by_id(idOrder)
-		O.ingredient = [Component.get_by_id(componentId).key() for componentId in components]
-		O.Sold = dateSoldOut
-		O.User = User().get_by_id(idUser).key()
-		O.put()
+		if O:
+			O.ingredient = [Component.get_by_id(componentId).key() for componentId in components]
+			O.Sold = dateSoldOut
+			O.User = User().get_by_id(idUser).key()
+			O.put()
 
 	def get(self, id):
 		return Order.get_by_id(id)
 
 	def setSold(self, idOrder, dateSold):
 		O = Order.get_by_id(idOrder)
-		O.Sold = dateSold
-		O.put()
+		if O:
+			O.Sold = dateSold
+			O.put()
 
 #
 #	Class apiFavoriteOder, manage operation on users favortie Order
@@ -148,11 +153,12 @@ class apifavoriteOrder():
 	
 	def update(self, ingredient, idFav, pName, pNbVote, idUser):
 		O = favoritOrder.get_by_id(idFav)
-		O.ingredient = ingredient
-		O.name = pName
-		O.User = User.get_by_key_name(idUser).key()
-		O.nbVote = pNbVote
-		O.put()
+		if O:
+			O.ingredient = ingredient
+			O.name = pName
+			O.User = User.get_by_key_name(idUser).key()
+			O.nbVote = pNbVote
+			O.put()
 	
 	def getUserfavOrder(self, id, pLimit):
 		if pLimit == None:
@@ -177,11 +183,12 @@ class apiStep():
 
 	def delete(self, idStep):
 		c = Component.all()
-		c.filter('Step =', Step.get_by_id(idStep).key())
-		for toto in c.run():
-			toto.delete()
-		q = Step.get_by_id(idStep)
-		q.delete()
+		s = Step.get_by_id(idStep)
+		if s:
+			c.filter('Step =', s.key())
+			for component in c.run():
+				component.delete()
+			s.delete()
 
 	def search(self, pName):
 		if pName is None:
@@ -192,10 +199,11 @@ class apiStep():
 
 	def update(self, name, number, pType, idStep):
 		oStep = Step.get_by_id(idStep)
-		oStep.name = name
-		oStep.number = number
-		oStep.step = pType
-		oStep.put()
+		if oStep:
+			oStep.name = name
+			oStep.number = number
+			oStep.step = pType
+			oStep.put()
 
 	def getChoice(self):
 		return ["one", "multi", "warning"];
@@ -214,15 +222,17 @@ class apiComponent():
 
 	def delete(self, idCom):
 		q = Component.get_by_id(idCom)
-		q.delete()
+		if q:
+			q.delete()
 
 	def update(self, idCom, Name, Stock, idStep, pPrix):
 		com = Component.get_by_id(idCom)
-		com.name = Name
-		com.stock = Stock
-		com.Step = Step.get_by_id(idStep).key()
-		com.prix = pPrix
-		com.put()
+		if com:
+			com.name = Name
+			com.stock = Stock
+			com.Step = Step.get_by_id(idStep).key()
+			com.prix = pPrix
+			com.put()
 
 	def search(self, pName):
 		if pName is None:

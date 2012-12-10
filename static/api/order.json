@@ -1,0 +1,212 @@
+{
+    "apiVersion": "0.1",
+    "swaggerVersion": "1.1",
+    "basePath": "http://open-order.appspot.com/api",
+    "resourcePath": "/order",
+    "apis": [
+        {
+            "path": "/order.{format}",
+            "description": "Manage order",
+            "operations": [
+                {
+                    "httpMethod": "GET",
+                    "summary": "Fetch orders",
+                    "responseClass": "Order",
+                    "nickname": "getOrders",
+                    "parameters": [
+                        {
+                            "name": "filter",
+                            "description": "Filter orders",
+                            "paramType": "query",
+                            "required": false,
+                            "allowMultiple": false,
+                            "dataType": "string",
+                            "allowableValues": {
+                                "valueType": "LIST",
+                                "values": [
+                                    "favourite",
+                                    "sold",
+                                    "unsold"
+                                ]
+                            }
+                        },
+                        {
+                            "name": "id",
+                            "description": "Fetch order by id",
+                            "paramType": "query",
+                            "required": false,
+                            "allowMultiple": false,
+                            "dataType": "int"
+                        },
+                        {
+                            "name": "user",
+                            "description": "Specify user",
+                            "paramType": "query",
+                            "required": false,
+                            "allowMultiple": false,
+                            "dataType": "string"
+                        }
+                    ]
+                },
+                {
+                    "httpMethod": "POST",
+                    "summary": "Create or update an order",
+                    "responseClass": "OrderId",
+                    "nickname": "createOrder",
+                    "parameters": [
+                        {
+                            "description": "Created an order",
+                            "paramType": "body",
+                            "required": true,
+                            "allowMultiple": false,
+                            "dataType": "Order"
+                        }
+                    ],
+                    "errorResponses": [
+                        {
+                            "code": 400,
+                            "reason": "Bad parameters"
+                        },
+                        {
+                            "code": 403,
+                            "reason": "Unable to authentificate user"
+                        }
+                    ]
+                },
+                {
+                    "httpMethod": "DELETE",
+                    "summary": "Delete an order",
+                    "notes": "This can only be done by an administrator user.",
+                    "responseClass": "void",
+                    "nickname": "deleteOrder",
+                    "parameters": [
+                        {
+                            "name": "id",
+                            "description": "The id that needs to be deleted",
+                            "paramType": "query",
+                            "required": true,
+                            "allowMultiple": false,
+                            "dataType": "int"
+                        }
+                    ],
+                    "errorResponses": [
+                        {
+                            "code": 400,
+                            "reason": "Invalid id supplied"
+                        },
+                        {
+                            "code": 403,
+                            "reason": "Unable to authentificate user"
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "path": "/order.{format}/sell",
+            "description": "Mark an order as selled",
+            "operations": [
+                {
+                    "httpMethod": "POST",
+                    "summary": "Mark an order as selled",
+                    "responseClass": "void",
+                    "nickname": "sellOrder",
+                    "parameters": [
+                        {
+                            "description": "Sell an order",
+                            "paramType": "body",
+                            "required": true,
+                            "allowMultiple": false,
+                            "dataType": "OrderId"
+                        }
+                    ],
+                    "errorResponses": [
+                        {
+                            "code": 400,
+                            "reason": "Bad parameters"
+                        },
+                        {
+                            "code": 403,
+                            "reason": "Unable to authentificate user"
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "path": "/order.{format}/favourite",
+            "description": "Add an order as favourite",
+            "operations": [
+                {
+                    "httpMethod": "POST",
+                    "summary": "Add an order as favourite",
+                    "responseClass": "void",
+                    "nickname": "favouriteOrder",
+                    "parameters": [
+                        {
+                            "description": "Add an order as favourite",
+                            "paramType": "body",
+                            "required": true,
+                            "allowMultiple": false,
+                            "dataType": "OrderFavouriteRequest"
+                        }
+                    ],
+                    "errorResponses": [
+                        {
+                            "code": 400,
+                            "reason": "Bad parameters"
+                        },
+                        {
+                            "code": 403,
+                            "reason": "Unable to authentificate user"
+                        }
+                    ]
+                }
+            ]
+        }
+    ],
+    "models": {
+        "Order": {
+            "id": "Order",
+            "properties": {
+                "components": {
+                    "type": "Array",
+                    "items": {
+                        "type": "int"
+                    }
+                },
+                "dateCreation": {
+                    "type": "int"
+                },
+                "dateSelling": {
+                    "type": "float"
+                },
+                "id": {
+                    "type": "int"
+                },
+                "fid": {
+                    "type": "int"
+                }
+            }
+        },
+        "OrderId": {
+            "id": "OrderResult",
+            "properties": {
+                "id": {
+                    "type": "int"
+                }
+            }
+        },
+        "OrderFavouriteRequest": {
+            "id": "OrderFavouriteRequest",
+            "properties": {
+                "id": {
+                    "type": "int"
+                },
+                "name": {
+                    "type": "string"
+                }
+            }
+        }
+    }
+}

@@ -4,7 +4,19 @@
     "basePath": "http://open-order.appspot.com/api",
     "apis": [
         {
+            "path": "/doc/auth.{format}",
+            "description": ""
+        },
+        {
             "path": "/doc/step.{format}",
+            "description": ""
+        },
+        {
+            "path": "/doc/component.{format}",
+            "description": ""
+        },
+        {
+            "path": "/doc/order.{format}",
             "description": ""
         }
     ]

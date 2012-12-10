@@ -136,7 +136,7 @@ function OrdersCtrl($location, $rootScope, $scope, $http, Component, Order) {
   };
 
   $scope.orderDetails = function(id) {
-    $scope.detailedOrder = Order.get({ id: id }, function() {
+    $scope.detailedOrder = Order.get({ api_key: $rootScope['profile']['api_key'], id: id }, function() {
       if ($scope.detailedOrder.user != null && $scope.graphUsers[$scope.detailedOrder.user] === undefined) {
         $scope.updateGraph($scope.detailedOrder.user);
       }

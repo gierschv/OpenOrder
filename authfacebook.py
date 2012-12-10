@@ -16,7 +16,7 @@ class AuthHandler(webapp2.RequestHandler):
 		uid = self.request.GET['userID']
 		signedRequest = self.request.GET['signedRequest']
 		if not uid or not signedRequest:
-			return self.abort(404)
+			return self.abort(400)
 
 		parsed_request = facebook.parse_signed_request(self.request.GET['signedRequest'], FACEBOOK_APP_SECRET)
 		if not parsed_request or uid != parsed_request['user_id']:

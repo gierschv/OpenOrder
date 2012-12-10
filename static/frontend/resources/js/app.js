@@ -222,20 +222,20 @@ $(document).ready(function() {
         }
 
         $.post('/api/order.json', JSON.stringify({ api_key: profile.api_key, components: components, fid: fid }), function(result) {
-          result = JSON.parse(result);
-            $('.order-id').text(result['orderId']);
-            $.mobile.changePage("#order-completed", { transition: "pop" });
+          // result = JSON.parse(result);
+          $('.order-id').text(result['orderId']);
+          $.mobile.changePage("#order-completed", { transition: "pop" });
 
-            $('.order-favourite').unbind().click(function() {
-              if ($('#order-favourite-name').val() === '') {
-                return false;
-              }
-
-              $.post('/api/order.json/favourite', JSON.stringify({ api_key: profile.api_key, id: result['orderId'], name: $('#order-favourite-name').val() }), function() {
-                $.mobile.changePage("#homeFB", { transition: "slidedown" });
-              });
+          $('.order-favourite').unbind().click(function() {
+            if ($('#order-favourite-name').val() === '') {
               return false;
+            }
+
+            $.post('/api/order.json/favourite', JSON.stringify({ api_key: profile.api_key, id: result['orderId'], name: $('#order-favourite-name').val() }), function() {
+              $.mobile.changePage("#homeFB", { transition: "slidedown" });
             });
+            return false;
+          });
         });
       });
     };
