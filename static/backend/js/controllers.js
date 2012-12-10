@@ -117,7 +117,7 @@ function ComponentsCtrl($location, $rootScope, $scope, $timeout, Step, Component
 
   $scope.removeComponent = function(componentId) {
     stepId = $('.ng-components ul.nav li.active').attr('step-id');
-    Component.remove({ id: componentId }, updateView);
+    Component.remove({ api_key: $rootScope['profile']['api_key'], id: componentId }, updateView);
   };
 }
 
