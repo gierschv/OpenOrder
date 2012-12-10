@@ -185,7 +185,7 @@ class apiStep():
 
 	def search(self, pName):
 		if pName is None:
-			return Step.all().fetch(limit=Step.all().count());
+			return Step.all().order('number').fetch(limit=Step.all().count());
 		else:
 			q = Step.all()
 			return q.filter('name =', pName).get()
